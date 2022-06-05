@@ -4,6 +4,7 @@ from flask import Blueprint, request, Response
 import jwt
 from models import enadlaAccount
 import secretsKeys
+import pytz
 
 from database import dbOperations
 
@@ -15,22 +16,18 @@ accountsBlueprint = Blueprint('accounts', __name__)
 def createAccount():
     desiredAccount = enadlaAccount.EnadlaAccount(**request.json)
 
-    isValidAccount = enadlaAccount.validate(desiredAccount)
+    #Delete undesired fields
+    desiredAccount.id = None
+    desiredAccount.creationDate = datetime.now(tz=pytz.UTC)
+    desiredAccount.currentMachine = None
+    desiredAccount.lastChangeOfMachineDate = None
 
-    if not isValidAccount:
-        return Response(
-            json.dumps(enadlaAccount.lastErrorsValidation),
-            status=400,
-            content_type='application/json'
-            )
+    validationResult = enadlaAccount.validate(desiredAccount, enadlaAccount.newAccountSchema)
 
+    if not validationResult[0]:
+        return Response(status=400, response=json.dumps(validationResult[1]))
 
-    resultOperation = dbOperations.saveNewAccount(desiredAccount)
-    
-    if resultOperation:
-        return resultOperation   
-
-    return Response(status=201)
+    return dbOperations.saveNewAccount(desiredAccount)
 
 @accountsBlueprint.route('/')
 def logIn():
