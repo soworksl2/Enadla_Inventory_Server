@@ -1,13 +1,16 @@
 from os import environ
-from sys import argv
-
 from flask import Flask
 
+import firebaseAdmin
 appServer = Flask(__name__)
 
-@appServer.route('/hola')
-def hello():
-    return 'hola mundo'
+# registering blueprints
+
+from routes import accounts
+
+appServer.register_blueprint(accounts.accountsBlueprint, url_prefix='/accounts')
+
+#-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-
 
 if __name__ == '__main__':
     port = int(environ.get('PORT', 8080))

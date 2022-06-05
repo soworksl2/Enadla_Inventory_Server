@@ -1,0 +1,1 @@
+jwtKeySecret = "EB3l,&S{l-e34'$5cXFy)~E83z8^N8"
