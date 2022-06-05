@@ -1,14 +1,18 @@
 from cerberus import Validator
 
-lastErrorsValidation = None
-
 class EnadlaAccount:
     
-    def __init__(self, email = None, password = None, ownerName = None, id = None) -> None:
+    def __init__(self, id = None, creationDate = None, creatorMachine = None, email = None,
+     password = None, ownerName = None, currentMachine = None, lastChangeOfMachineDate = None) -> None:
+        self.id = id
+        self.creationDate = creationDate
+        self.creatorMachine = creatorMachine
         self.email = email
         self.password = password
         self.ownerName = ownerName
-        self.id = id
+        self.currentMachine = currentMachine
+        self.lastChangeOfMachineDate = lastChangeOfMachineDate
+
 
     def getStrictDict(self, optionalsAttributes = []):
         output = {
@@ -22,40 +26,40 @@ class EnadlaAccount:
         
         return output
 
-def validate(enadlaAccount: EnadlaAccount):
-    """Validate the object and return a tuple (Bool, Dict | None). 
-    the dictionari represent the errors"""
-    
-    global lastErrorsValidation
+emailRegex = '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
-    emailRegex = '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-    enadlaAccountSchema = {
-    'email' : {
-        'required': True,
-        'type': 'string',
-        'empty': False,
-        'maxlength': 25,
-        'regex': emailRegex
-        },
-    'password': {
-        'required': True,
-        'type': 'string',
-        'empty': False,
+newAccountSchema = {
+    "creatorMachine": {
+        "type": "string",
+        "required": True,
+        "empty": False
     },
-    'ownerName':{
+    "email": {
+        'required': True,
+        'type': 'string',
+        'empty': False,
+        'maxlength': 50,
+        'regex': emailRegex
+    },
+    "password": {
         'required': True,
         'type': 'string',
         'empty': False
     },
-    'id':{
+    "ownerName": {
+        'required': True,
         'type': 'string',
-        'default': ''
+        'empty': False
     }
 }
-    
-    v = Validator(enadlaAccountSchema)
 
-    isValid = v.validate(enadlaAccount.getStrictDict())
+def validate(enadlaAccount: EnadlaAccount, schema):
+    """Validate the object and return a tuple (Bool, Dict | None). 
+    the dictionary represent the errors"""
+    
+    v = Validator(schema, allow_unknown=True)
+
+    isValid = v.validate(enadlaAccount.__dict__)
     lastErrorsValidation = None if isValid else v.errors
 
-    return isValid
+    return (isValid, lastErrorsValidation)
