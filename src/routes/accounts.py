@@ -6,7 +6,7 @@ from models import enadlaAccount
 import secretsKeys
 import pytz
 
-from database import dbOperations
+from database.dbOperations import dbAccountOperations, dbOperations
 
 
 accountsBlueprint = Blueprint('accounts', __name__)
@@ -27,7 +27,14 @@ def createAccount():
     if not validationResult[0]:
         return Response(status=400, response=json.dumps(validationResult[1]))
 
-    return dbOperations.saveNewAccount(desiredAccount)
+    if dbAccountOperations.emailAlreadyExists(desiredAccount.email):
+        return Response(status=409)
+
+    if not dbAccountOperations.isMachineAvalibleToSignUp(desiredAccount.creatorMachine):
+        return Response(status=429)
+
+    dbAccountOperations.saveNewAccount(desiredAccount)
+    return Response(status=201)
 
 @accountsBlueprint.route('/')
 def logIn():
