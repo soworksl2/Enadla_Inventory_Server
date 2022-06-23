@@ -1,11 +1,14 @@
 import json
 from datetime import datetime, timedelta
-from flask import Blueprint, request, Response
-import jwt
-from models import enadlaAccount
-import secretsKeys
-import pytz
 
+import jwt
+import pytz
+from flask import Blueprint, request, Response
+
+import secretsKeys
+from models import enadlaAccount
+from helpers import serialization
+# TODO: dbOperations should be eliminate when will be posible
 from database.dbOperations import dbAccountOperations, dbOperations
 
 
@@ -16,22 +19,32 @@ accountsBlueprint = Blueprint('accounts', __name__)
 def createAccount():
     desiredAccount = enadlaAccount.EnadlaAccount(**request.json)
 
-    #Delete undesired fields
+    #Delete undesired fields and adding today date
     desiredAccount.id = None
-    desiredAccount.creationDate = datetime.now(tz=pytz.UTC)
     desiredAccount.currentMachine = None
     desiredAccount.lastChangeOfMachineDate = None
+    desiredAccount.creationDate = datetime.now(tz=pytz.UTC)
 
     validationResult = enadlaAccount.validate(desiredAccount, enadlaAccount.newAccountSchema)
 
     if not validationResult[0]:
-        return Response(status=400, response=json.dumps(validationResult[1]))
+        bodyResponse = {
+            'serverInformation': 'the account is not valid',
+            'validationFails': validationResult[1]
+        }
+        return Response(status=400, response=json.dumps(bodyResponse))
 
     if dbAccountOperations.emailAlreadyExists(desiredAccount.email):
-        return Response(status=409)
+        bodyResponse = {
+            'serverInformation': f'the email "{desiredAccount.email}" already exists'
+        }
+        return Response(status=409, response=json.dumps(bodyResponse))
 
     if not dbAccountOperations.isMachineAvalibleToSignUp(desiredAccount.creatorMachine):
-        return Response(status=429)
+        bodyResponse = {
+            'serverInformation': 'the machine from where you are trying to register has many sign up'
+        }
+        return Response(status=429, response=json.dumps(bodyResponse))
 
     dbAccountOperations.saveNewAccount(desiredAccount)
     return Response(status=201)
@@ -53,3 +66,51 @@ def logIn():
     res.headers['authorization'] = currentToken
 
     return res
+
+@accountsBlueprint.route('/auth/', methods=['GET'])
+def authenticateAccount():
+    accountToAuthenticate = enadlaAccount.EnadlaAccount(**request.json)
+
+    # deleting unusable fields
+    accountToAuthenticate.id = None
+    accountToAuthenticate.creationDate = None
+    accountToAuthenticate.creatorMachine = None
+    accountToAuthenticate.ownerName = None
+    accountToAuthenticate.currentMachine = None
+    accountToAuthenticate.lastChangeOfMachineDate = None
+
+    if accountToAuthenticate.email == None:
+        responseBody = {
+            'serverInformation': 'the email cannot be null'
+        }
+        return Response(status=400, response=json.dumps(responseBody))
+
+    originalAccount = dbAccountOperations.getAccountByEmail(accountToAuthenticate.email)
+
+    if originalAccount == None:
+        responseBody = {
+            'serverInformation': f'the email "{accountToAuthenticate.email}" does not exists'
+        }
+        return Response(status=404, response=json.dumps(responseBody))
+
+    if originalAccount.password != accountToAuthenticate.password:
+        responseBody = {
+            'serverInformation': 'the password is incorrect',
+            'updatedAccount': json.dumps(originalAccount.__dict__, default=serialization.defaultDump)
+        }
+        return Response(status=400, response=json.dumps(responseBody))
+
+    #the auth is correct
+    responseBody = {
+        'updatedAccount': json.dumps(originalAccount.__dict__, default=serialization.defaultDump)
+    }
+
+    currentJwt = jwt.encode({
+        'uid': originalAccount.id,
+        'exp': datetime.now(tz=pytz.UTC) + timedelta(hours=2)
+    }, key=secretsKeys.jwtKeySecret)
+
+    currentResponse = Response(status=200, response=json.dumps(responseBody))
+    currentResponse.headers['auth'] = currentJwt
+
+    return currentResponse

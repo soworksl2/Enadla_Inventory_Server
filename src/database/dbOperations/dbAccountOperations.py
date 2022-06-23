@@ -58,3 +58,16 @@ def isMachineAvalibleToSignUp(machineId):
             break
     
     return True
+
+def getAccountByEmail(email):
+    if email == None:
+        return None
+
+    emails = db.collection(accountCollectionName).where('email', '==', email).get()
+
+    if len(emails) <= 0:
+        return None
+    
+    account = enadlaAccount.EnadlaAccount(**emails[0].to_dict())
+    account.id = emails[0].id
+    return account
