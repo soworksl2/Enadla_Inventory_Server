@@ -50,14 +50,6 @@ def createAccount():
 def authenticateAccount():
     accountToAuthenticate = enadlaAccount.EnadlaAccount(**request.json)
 
-    # deleting unusable fields
-    accountToAuthenticate.id = None
-    accountToAuthenticate.creationDate = None
-    accountToAuthenticate.creatorMachine = None
-    accountToAuthenticate.ownerName = None
-    accountToAuthenticate.currentMachine = None
-    accountToAuthenticate.lastChangeOfMachineDate = None
-
     if accountToAuthenticate.email == None:
         responseBody = {
             'serverInformation': 'the email cannot be null'
@@ -79,7 +71,8 @@ def authenticateAccount():
         }
         return Response(status=400, response=json.dumps(responseBody))
 
-    #the auth is correct
+    #Here the authentication is correct
+    
     responseBody = {
         'updatedAccount': json.dumps(originalAccount.__dict__, default=serialization.defaultDump)
     }
