@@ -8,12 +8,9 @@ from flask import Blueprint, request, Response
 import secretsKeys
 from models import enadlaAccount
 from helpers import serialization
-# TODO: dbOperations should be eliminate when will be posible
-from database.dbOperations import dbAccountOperations, dbOperations
-
+from database.dbOperations import dbAccountOperations
 
 accountsBlueprint = Blueprint('accounts', __name__)
-
 
 @accountsBlueprint.route('/', methods=['POST'])
 def createAccount():
@@ -48,24 +45,6 @@ def createAccount():
 
     dbAccountOperations.saveNewAccount(desiredAccount)
     return Response(status=201)
-
-@accountsBlueprint.route('/')
-def logIn():
-    credentialAccount = enadlaAccount.EnadlaAccount(**request.json)
-    
-    loginResult = dbOperations.confirmCredentials(credentialAccount)
-
-    if not loginResult['succes']:
-        return loginResult['response']
-    
-    accountFound = loginResult['response']
-
-    currentToken = jwt.encode({'uid': accountFound.id, 'exp': datetime.now() + timedelta(days=1)}, secretsKeys.jwtKeySecret)
-
-    res = Response(json.dumps(accountFound.getStrictDict(['id'])), status=200)
-    res.headers['authorization'] = currentToken
-
-    return res
 
 @accountsBlueprint.route('/auth/', methods=['GET'])
 def authenticateAccount():
