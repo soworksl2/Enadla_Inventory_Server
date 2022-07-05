@@ -7,10 +7,11 @@ appServer = Flask(__name__)
 
 # registering blueprints
 
-from routes import accounts, tokenInformation
+from routes import accounts, tokenInformation, versions
 
 appServer.register_blueprint(accounts.accountsBlueprint, url_prefix='/accounts')
 appServer.register_blueprint(tokenInformation.tokenInformationBlueprint, url_prefix='/tokenInformation')
+appServer.register_blueprint(versions.versionsBlueprint, url_prefix='/versions')
 
 #-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-
 
