@@ -23,7 +23,7 @@ def getTokenInformation():
 
     if not isValidJWT:
         responseBody = {
-            'serverInformation': 'The JWT is not valid'
+            'serverInformation': 'The JWT is not valid or does not exist'
         }
         return Response(status=401, response=json.dumps(responseBody))
     
