@@ -5,84 +5,84 @@ import jwt
 import pytz
 from flask import Blueprint, request, Response
 
-import secretsKeys
-from models import enadlaAccount
+import secrets_keys
+from models import enadla_account
 from helpers import serialization
-from database.dbOperations import dbAccountOperations
+from database.operations import account_operations
 
-accountsBlueprint = Blueprint('accounts', __name__)
+accounts_BP = Blueprint('accounts', __name__)
 
-@accountsBlueprint.route('/', methods=['POST'])
-def createAccount():
-    desiredAccount = enadlaAccount.EnadlaAccount(**request.json)
+@accounts_BP.route('/', methods=['POST'])
+def create_account():
+    desired_account = enadla_account.EnadlaAccount(**request.json)
 
     #Delete undesired fields and adding today date
-    desiredAccount.id = None
-    desiredAccount.currentMachine = None
-    desiredAccount.lastChangeOfMachineDate = None
-    desiredAccount.creationDate = datetime.now(tz=pytz.UTC)
+    desired_account.id = None
+    desired_account.current_machine = None
+    desired_account.last_change_of_machine_date = None
+    desired_account.creation_date = datetime.now(tz=pytz.UTC)
 
-    validationResult = enadlaAccount.validate(desiredAccount, enadlaAccount.newAccountSchema)
+    validation_result = enadla_account.validate(desired_account, enadla_account.new_account_schema)
 
-    if not validationResult[0]:
-        bodyResponse = {
-            'serverInformation': 'the account is not valid',
-            'validationFails': validationResult[1]
+    if not validation_result[0]:
+        body_response = {
+            'server_information': 'the account is not valid',
+            'validations_fails': validation_result[1]
         }
-        return Response(status=400, response=json.dumps(bodyResponse))
+        return Response(status=400, response=json.dumps(body_response))
 
-    if dbAccountOperations.emailAlreadyExists(desiredAccount.email):
-        bodyResponse = {
-            'serverInformation': f'the email "{desiredAccount.email}" already exists'
+    if account_operations.email_already_exists(desired_account.email):
+        body_response = {
+            'server_information': f'the email "{desired_account.email}" already exists'
         }
-        return Response(status=409, response=json.dumps(bodyResponse))
+        return Response(status=409, response=json.dumps(body_response))
 
-    if not dbAccountOperations.isMachineAvalibleToSignUp(desiredAccount.creatorMachine):
-        bodyResponse = {
-            'serverInformation': 'the machine from where you are trying to register has many sign up'
+    if not account_operations.is_machine_avalible_to_sign_up(desired_account.creator_machine):
+        body_response = {
+            'server_information': 'the machine from where you are trying to register has many sign up'
         }
-        return Response(status=429, response=json.dumps(bodyResponse))
+        return Response(status=429, response=json.dumps(body_response))
 
-    dbAccountOperations.saveNewAccount(desiredAccount)
+    account_operations.save_new_account(desired_account)
     return Response(status=201)
 
-@accountsBlueprint.route('/auth/', methods=['GET'])
-def authenticateAccount():
-    accountToAuthenticate = enadlaAccount.EnadlaAccount(**request.json)
+@accounts_BP.route('/auth/', methods=['GET'])
+def authenticate_account():
+    account_to_authenticate = enadla_account.EnadlaAccount(**request.json)
 
-    if accountToAuthenticate.email == None:
-        responseBody = {
-            'serverInformation': 'the email cannot be null'
+    if account_to_authenticate.email == None:
+        response_body = {
+            'server_information': 'the email cannot be null'
         }
-        return Response(status=400, response=json.dumps(responseBody))
+        return Response(status=400, response=json.dumps(response_body))
 
-    originalAccount = dbAccountOperations.getAccountByEmail(accountToAuthenticate.email)
+    original_account = account_operations.get_account_by_email(account_to_authenticate.email)
 
-    if originalAccount == None:
-        responseBody = {
-            'serverInformation': f'the email "{accountToAuthenticate.email}" does not exists'
+    if original_account == None:
+        response_body = {
+            'server_information': f'the email "{account_to_authenticate.email}" does not exists'
         }
-        return Response(status=404, response=json.dumps(responseBody))
+        return Response(status=404, response=json.dumps(response_body))
 
-    if originalAccount.password != accountToAuthenticate.password:
-        responseBody = {
-            'serverInformation': 'the password is incorrect',
-            'updatedAccount': json.dumps(originalAccount.__dict__, default=serialization.defaultDump)
+    if original_account.password != account_to_authenticate.password:
+        response_body = {
+            'server_information': 'the password is incorrect',
+            'updated_account': json.dumps(original_account.__dict__, default=serialization.default_dump)
         }
-        return Response(status=400, response=json.dumps(responseBody))
+        return Response(status=400, response=json.dumps(response_body))
 
     #Here the authentication is correct
     
-    responseBody = {
-        'updatedAccount': json.dumps(originalAccount.__dict__, default=serialization.defaultDump)
+    response_body = {
+        'updated_account': json.dumps(original_account.__dict__, default=serialization.default_dump)
     }
 
-    currentJwt = jwt.encode({
-        'uid': originalAccount.id,
+    current_JWT = jwt.encode({
+        'uid': original_account.id,
         'exp': datetime.now(tz=pytz.UTC) + timedelta(hours=2)
-    }, key=secretsKeys.jwtKeySecret)
+    }, key=secrets_keys.jwt_key_secret)
 
-    currentResponse = Response(status=200, response=json.dumps(responseBody))
-    currentResponse.headers['auth'] = currentJwt
+    current_response = Response(status=200, response=json.dumps(response_body))
+    current_response.headers['auth'] = current_JWT
 
-    return currentResponse
+    return current_response

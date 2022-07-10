@@ -2,7 +2,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-firebaseKeyDict = {
+firebase_key_dict = {
   "type": "service_account",
   "project_id": "enadla-inventory-server",
   "private_key_id": "8bdb80ef31a44261f8c54187287bcbc8c0975895",
@@ -15,8 +15,8 @@ firebaseKeyDict = {
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-vqx5d%40enadla-inventory-server.iam.gserviceaccount.com"
 }
 
-firebaseCredential = credentials.Certificate(firebaseKeyDict)
+firebase_credentials = credentials.Certificate(firebase_key_dict)
 
-firebaseApp = firebase_admin.initialize_app(firebaseCredential)
+firebaseApp = firebase_admin.initialize_app(firebase_credentials)
 
 db = firestore.client()

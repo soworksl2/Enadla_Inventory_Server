@@ -3,19 +3,19 @@ from sys import argv
 
 from flask import Flask
 
-appServer = Flask(__name__)
+app_server = Flask(__name__)
 
 # registering blueprints
 
-from routes import accounts, tokenInformation, versions
+from routes import accounts, token_information, versions
 
-appServer.register_blueprint(accounts.accountsBlueprint, url_prefix='/accounts')
-appServer.register_blueprint(tokenInformation.tokenInformationBlueprint, url_prefix='/tokenInformation')
-appServer.register_blueprint(versions.versionsBlueprint, url_prefix='/versions')
+app_server.register_blueprint(accounts.accounts_BP, url_prefix='/accounts')
+app_server.register_blueprint(token_information.TokenInformation_BP, url_prefix='/tokenInformation')
+app_server.register_blueprint(versions.versions_BP, url_prefix='/versions')
 
 #-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-
 
 if __name__ == '__main__':
-    isDebug = True if 'DEBUG' in argv else False
+    is_debug = True if 'DEBUG' in argv else False
     port = int(environ.get('PORT', 8080))
-    appServer.run(debug=isDebug, port=port)
+    app_server.run(debug=is_debug, port=port)
