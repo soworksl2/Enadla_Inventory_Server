@@ -14,6 +14,22 @@ class EnadlaAccount:
         self.current_machine = current_machine
         self.last_change_of_machine_date = last_change_of_machine_date
 
+def trim_all_fields_in_dict(dict_to_trim: dict):
+    output = {}
+
+    for key in dict_to_trim:
+        if isinstance(dict_to_trim[key], str):
+            output[key] = dict_to_trim[key].strip()
+        elif isinstance(dict_to_trim[key], dict):
+            output[key] = trim_all_fields_in_dict(dict_to_trim[key])
+        else:
+            output[key] = dict_to_trim[key]
+    
+    return output
+
+def normalize(enadla_account: EnadlaAccount, schema = None):
+    pass
+
 email_regex = '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 new_account_schema = {
@@ -47,7 +63,9 @@ def validate(enadla_account: EnadlaAccount, schema):
     
     v = Validator(schema, allow_unknown=True)
 
-    is_valid = v.validate(enadla_account.__dict__)
+    account_dict = trim_all_fields_in_dict(enadla_account.__dict__)
+
+    is_valid = v.validate(account_dict)
     last_errors_validation = None if is_valid else v.errors
 
     return (is_valid, last_errors_validation)
