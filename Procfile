@@ -1,3 +1,1 @@
-web: export PYTHONPATH=src
-
-web: gunicorn --bind 0.0.0.0:${PORT} src.app:app_server --preload --timeout 10
+web: env PYTHONPATH=$PYTHONPATH:$PWD/src gunicorn --bind 0.0.0.0:${PORT} src.app:app_server --preload --timeout 10
