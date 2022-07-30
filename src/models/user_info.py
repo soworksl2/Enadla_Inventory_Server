@@ -5,6 +5,7 @@ from enum import Enum
 import pytz
 
 from helpers import validation_functions as v
+from helpers import model_helper
 
 @dataclass
 class ExtraUserInfo:
@@ -17,6 +18,10 @@ class ExtraUserInfo:
         if self.creation_date is None:
             self.creation_date = datetime.now(tz=pytz.UTC)
 
+    @classmethod
+    def from_dict(cls, **kwargs):
+        return model_helper.create_obj(cls, **kwargs)
+
 
 @dataclass
 class UserInfo:
@@ -27,6 +32,21 @@ class UserInfo:
     is_verified: bool = False
     owner_name: str = None
     extra_info: ExtraUserInfo = None
+
+    @classmethod
+    def from_dict(cls, **kwargs):
+        """create a UserInfo from a dictionary ignoring the extra fields
+
+        Returns:
+            UserInfo: the created UserInfo
+        """
+
+        instance = model_helper.create_obj(cls, **kwargs)
+
+        if instance.extra_info is not None and not isinstance(instance.extra_info, ExtraUserInfo):
+            instance.extra_info = ExtraUserInfo.from_dict(instance.extra_info)
+        
+        return instance
 
 
 # validation functions
