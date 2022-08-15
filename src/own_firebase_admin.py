@@ -2,6 +2,12 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
+# --- Exposing firebase module to be able to export from this wrapper 
+# (exporting modules from here ensure that the firebase app is initialized)
+from firebase_admin import auth
+# --- -*-**-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-***--**-*-*--**-*-*-*-*--**--
+
+#TODO: get this key from environment variables instead of hardcoded here
 firebase_key_dict = {
   "type": "service_account",
   "project_id": "enadla-inventory-server",
