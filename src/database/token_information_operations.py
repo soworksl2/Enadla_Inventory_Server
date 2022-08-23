@@ -21,7 +21,7 @@ def __get_token_information_SnapShot_by_id(user_info_id):
     if(len(token_informations_ref) < 1):
         new_token_information = token_information.TokenInformation(user_info_id, 0, datetime.now(tz=pytz.utc))
         _, new_token_information_ref = token_information_collection.add(new_token_information.__dict__)
-        return new_token_information_ref
+        return new_token_information_ref.get()
     
     return token_informations_ref[0]
 
