@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import pytz
 from flask import Blueprint, request, Response
 
-from database.operations import token_information_operations
+from database import token_information_operations
 from helpers import serialization, JWT_manipulation
 
 DAYS_INTERVAL_TO_RECHARGE = int(os.environ.get('DAYS_INTERVAL_TO_RECHARGE_FREE_TOKENS', '30')) #TODO: extract this const value to environ
