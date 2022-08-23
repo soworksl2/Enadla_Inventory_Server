@@ -7,9 +7,9 @@ app_server = Flask(__name__)
 
 # registering blueprints
 
-from routes import accounts, token_information, versions
+from routes import user_info_bp, token_information, versions
 
-app_server.register_blueprint(accounts.accounts_BP, url_prefix='/accounts')
+app_server.register_blueprint(user_info_bp.user_info_bp, url_prefix='/accounts')
 #app_server.register_blueprint(token_information.TokenInformation_BP, url_prefix='/tokenInformation')
 app_server.register_blueprint(versions.versions_BP, url_prefix='/versions')
 
