@@ -6,41 +6,36 @@ import pytz
 from own_firebase_admin import db
 from models import token_information
 
+
+#Collections names as CN
 is_debug = 'DEBUG' in argv
 
-#Collections names
-TokenInformation_collection_name = 'tokenInformation' if not is_debug else 'tokenInformation-dev'
+CN_TOKEN_INFORMATION = 'token_information' if not is_debug else 'test_token_information'
 #*-*--**-*-*-*--**--*
 
-def get_token_information_by_id_account(id_account):
-    token_information_founds = db.collection(TokenInformation_collection_name).where('account_id', '==', id_account).get()
+def __get_token_information_SnapShot_by_id(user_info_id):
+    token_information_collection = db.collection(CN_TOKEN_INFORMATION)
 
-    if len(token_information_founds) <= 0:
-        return None
+    token_informations_ref = token_information_collection.where('user_info_id', '==', user_info_id).get()
 
-    return token_information.TokenInformation(**token_information_founds[0].to_dict())
-
-def add_free_tokens_by_id_account(id_account, amount_to_add, max_free_tokens_limit):
-    if not amount_to_add >= 0:
-        raise ValueError(f'amountToAdd should be equals or greather than 0 and you pass to in "{id_account}"')
-    if not max_free_tokens_limit > 0:
-        raise ValueError(f'maxFreeTokensLimit should be greather than 0 and you pass to in "{max_free_tokens_limit}"')
-
-    TokenInformation_founds = db.collection(TokenInformation_collection_name).where('account_id', '==', id_account).get()
-
-    if len(TokenInformation_founds) <= 0:
-        raise Exception('the tokenInformation with the respectively id_account was not found')
-
-    current_TokenInformation_snapshot = TokenInformation_founds[0]
-    current_free_tokens_cache = current_TokenInformation_snapshot.get('free_tokens')
-
-    updated_free_tokens = current_free_tokens_cache + amount_to_add
-    if updated_free_tokens > max_free_tokens_limit:
-        updated_free_tokens = max_free_tokens_limit
+    if(len(token_informations_ref) < 1):
+        new_token_information = token_information.TokenInformation(user_info_id, 0, datetime.now(tz=pytz.utc))
+        _, new_token_information_ref = token_information_collection.add(new_token_information.__dict__)
+        return new_token_information_ref
     
-    current_TokenInformation_snapshot.reference.update({
-        'free_tokens': updated_free_tokens,
-        'last_charge_free_tokens': datetime.now(tz=pytz.UTC)
-    })
+    return token_informations_ref[0]
 
-    return updated_free_tokens - current_free_tokens_cache
+def recharge_tokens(user_info_id, amount_to_recharge):
+    if(amount_to_recharge < 0):
+        raise ValueError('the amount_to_recharge shoul be greather or equals than 0')
+
+    token_information_SnapShot = __get_token_information_SnapShot_by_id(user_info_id)
+    current_amount_of_tokens = token_information_SnapShot.get('amount_of_tokens')
+    updated_amount_of_tokens = current_amount_of_tokens + amount_to_recharge
+
+    update_query = {
+        'amount_of_tokens': updated_amount_of_tokens,
+        'datetime_last_token_recharge': datetime.now(tz=pytz.utc)
+    }
+
+    token_information_SnapShot.reference.update(update_query)
