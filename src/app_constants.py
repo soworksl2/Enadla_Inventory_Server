@@ -3,6 +3,59 @@
 
 import os
 
+def get_init_tokens_on_signUp():
+    """returns the amoun of tokens that an user will get when he signUp in endadla
+
+    Raises:
+        ValueError: if the INIT_TOKENS_ON_SIGNUP is minor than 0
+
+    Returns:
+        int: the amount of tokens that an user will get on signup
+    """
+    
+    output = int(os.environ['INIT_TOKENS_ON_SIGNUP'])
+
+    if output < 0:
+        raise ValueError('the INIT_TOKENS_ON_SIGNUP cannot be minor than 0')
+
+    return output
+
+def get_range_for_max_signUp():
+    """returns the range of days for the max signup per machine that a machine can do
+
+    Raises:
+        ValueError: if the value is minor than 1
+
+    Returns:
+        int: the range for max signUp per machine that the machine can do
+    """
+
+    output = os.environ['RANGE_FOR_MAX_SIGNUP']
+    output = int(output)
+
+    if output < 1:
+        raise ValueError('the RANGE_FOR_MAX_SIGNUP cannot be minor than 1')
+
+    return output
+
+def get_max_signUp_per_machine_in_range():
+    """returns the max signup per machine that a machine can do in a determined range of days
+
+    Raises:
+        ValueError: if the value is minor tha 1
+
+    Returns:
+        int: the max signup per machine that a machine can do
+    """
+
+    output = os.environ['MAX_SIGNUP_PER_MACHINE_IN_RANGE']
+    output = int(output)
+
+    if output < 1:
+        raise ValueError("The MAX_SIGNUP_PER_MACHINE_IN_RANGE cannot be minor than 1")
+    
+    return output
+
 def get_last_compatible_client_version():
     version_str = os.environ['LAST_COMPATIBLE_CLIENT_VERSION']
     try:
