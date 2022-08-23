@@ -41,16 +41,15 @@ class UserInfo:
             UserInfo: the created UserInfo
         """
 
-        instance = model_helper.create_obj(cls, **kwargs)
+        instance = model_helper.create_obj(cls, ignore_extra_fields=True, **kwargs)
 
         if instance.extra_info is not None and not isinstance(instance.extra_info, ExtraUserInfo):
-            instance.extra_info = ExtraUserInfo.from_dict(instance.extra_info)
+            instance.extra_info = ExtraUserInfo.from_dict(**instance.extra_info)
         
         return instance
 
 
 # validation functions
-
 
 R_SIGNUP = 'signup'
 
@@ -69,7 +68,6 @@ def __has_extra_info(user_info):
 def __sign_up_validation(user_info: UserInfo):
     
     fails = []
-
 
     if v.is_empty_str(user_info.email):
         fails.append(ValidationFails.empty_email)
@@ -98,6 +96,19 @@ def __sign_up_validation(user_info: UserInfo):
     return (len(fails) <= 0, fails)
 
 def validate(user_info, rule_set):
+    """Validate a user_info and return if it is valid and its errors
+
+    Args:
+        user_info (user_info.UserInfo): the user_info to verify
+        rule_set (str): the rule set to use (is defined in user_info as user_info.R_[name_of_rule_set])
+
+    Raises:
+        ValueError: the rule set does not exists
+
+    Returns:
+        tuple[bool, set]: the first element is if the user info is valid or not and the second a list without repetition with all the validation exception
+    """
+
     if rule_set == R_SIGNUP:
         return __sign_up_validation(user_info)
     else:
