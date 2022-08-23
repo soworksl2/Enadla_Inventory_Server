@@ -25,7 +25,10 @@ def __default_serialization(obj_to_serialize):
     if isinstance(obj_to_serialize, datetime):
         return __datetime_serialization(obj_to_serialize)
     else:
-        raise TypeError(f'{type(obj_to_serialize)} cannot be serialized')
+        try:
+            return obj_to_serialize.__dict__
+        except:
+            raise TypeError(f'{type(obj_to_serialize)} cannot be serialized')
 
 def dumps(obj):
     """serialize an obj or a dict to string

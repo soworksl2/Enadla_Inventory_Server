@@ -18,6 +18,16 @@ class Point:
         self.x = x
         self.y = y
 
+class Wallet:
+    def __init__(self, id, money):
+        self.id = id
+        self.money = money
+
+class Person:
+    def __init__(self, name, wallet):
+        self.name = name
+        self.wallet = wallet
+
 class TestOwnJson(unittest.TestCase):
     
     # testing dumps as d
@@ -93,6 +103,32 @@ class TestOwnJson(unittest.TestCase):
         with self.assertRaises(ValueError):
             #act and assert
             serialized_obj = own_json.dumps(obj)
+
+    def test_d_given_nested_obj_then_convert_to_dict_and_serialize_it(self):
+        #arrange
+        obj_to_dump = {
+            'nested_obj': Point(10, 12)
+        }
+
+        #act
+        dumped_obj = own_json.dumps(obj_to_dump)
+
+        #assert
+        expected = '{"nested_obj": {"x": 10, "y": 12}}'
+        self.assertEqual(dumped_obj, expected)
+
+    def test_d_given_composed_nested_obj_then_convert_to_dict_and_serialize_it(self):
+        #arrange
+        composed_obj = {
+            'person': Person('test', Wallet('test', 100))
+        }
+
+        #act
+        dumped_obj = own_json.dumps(composed_obj)
+
+        #assert
+        expected = '{"person": {"name": "test", "wallet": {"id": "test", "money": 100}}}'
+        self.assertEqual(dumped_obj, expected)
 
     # *--***-*-*-*-*-
 
