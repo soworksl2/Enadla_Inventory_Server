@@ -89,3 +89,24 @@ def save_new_user_info(user_info_to_save: user_info.UserInfo):
     token_information_operations.recharge_tokens(updated_user_info.uid, INIT_TOKENS_ON_SIGNUP)
 
     return updated_user_info
+
+def __get_extra_info(uid):
+    raise NotImplementedError()
+
+def get_user_info_by_email(email, add_extra_info = False):
+    
+    try:
+        user_info_record = auth.get_user_by_email(email)
+    except auth.UserNotFoundError:
+        return None
+
+    user_info_output = user_info.UserInfo(
+        uid=user_info_record.uid,
+        email=user_info_record.email,
+        password=None,
+        is_verified=user_info_record.email_verified,
+        owner_name=user_info_record.display_name,
+        extra_info= None if not add_extra_info else __get_extra_info(user_info_record.uid)
+    )
+
+    return user_info_output
