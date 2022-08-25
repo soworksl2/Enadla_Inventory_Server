@@ -114,13 +114,13 @@ def authenticate_by_credentials():
         'returnSecureToken': True
     }
     r = requests.post(url=f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}', json=firebase_request_body)
-    print(API_KEY)
+
     if not r.status_code == 200:
         return own_response_factory.create_json_body(400, error_code=app_error_code.UNEXPECTED_ERROR)
 
     response_content =  r.json()
 
-    current_user_info = auth_db_operations.get_user_info_by_email(email)
+    current_user_info = auth_db_operations.get_user_info_by_email(email, add_extra_info=True)
 
     uid_token = auth.create_custom_token(response_content['localId'], { 'verified': current_user_info.is_verified }).decode('utf-8')
     refresh_token = response_content['refreshToken']

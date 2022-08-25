@@ -91,7 +91,20 @@ def save_new_user_info(user_info_to_save: user_info.UserInfo):
     return updated_user_info
 
 def __get_extra_info(uid):
-    raise NotImplementedError()
+    extra_user_info_collection = db.collection(CN_EXTRA_USER_INFO)
+
+    extra_user_info_founds = extra_user_info_collection.where('uid', '==', uid).get()
+
+    if len(extra_user_info_founds) <= 0:
+        raise Exception(f'the extra info for the uid was not found in the collection "{CN_EXTRA_USER_INFO}"')
+
+    specific_extra_user_info = extra_user_info_founds[0]
+
+    return user_info.ExtraUserInfo(
+        uid=uid,
+        creation_date=specific_extra_user_info.get('creation_date'),
+        creator_machine=specific_extra_user_info.get('creator_machine')
+    )
 
 def get_user_info_by_email(email, add_extra_info = False):
     
