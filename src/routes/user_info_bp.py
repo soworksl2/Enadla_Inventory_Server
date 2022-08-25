@@ -3,6 +3,7 @@ from flask import Blueprint, request
 import requests
 
 import app_error_code
+import app_constants
 from models import user_info
 from helpers import own_json
 from helpers import own_response_factory
@@ -100,7 +101,7 @@ def sign_up():
 @user_info_bp.route('/auth/', methods=['GET'])
 def authenticate_by_credentials():
     
-    API_KEY = 'AIzaSyBJkUNVL2iItbAC3WovZpETLH604WXdIVE'
+    API_KEY = app_constants.get_web_api_key()
 
     is_valid_request, email, password = __get_auth_credentials_request_data()
 
@@ -113,7 +114,7 @@ def authenticate_by_credentials():
         'returnSecureToken': True
     }
     r = requests.post(url=f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}', json=firebase_request_body)
-
+    print(API_KEY)
     if not r.status_code == 200:
         return own_response_factory.create_json_body(400, error_code=app_error_code.UNEXPECTED_ERROR)
 

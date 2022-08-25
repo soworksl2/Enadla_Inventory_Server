@@ -3,6 +3,16 @@
 
 import os
 
+def get_web_api_key():
+    """returns the web api key of this project
+
+    Returns:
+        str: the firebase web api key
+    """
+
+    output = os.environ['WEB_API_KEY']
+    return output
+
 def get_init_tokens_on_signUp():
     """returns the amoun of tokens that an user will get when he signUp in endadla
 
