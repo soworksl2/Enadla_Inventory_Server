@@ -2,12 +2,14 @@ from sys import argv
 from datetime import datetime, timedelta
 
 import pytz
+import requests
 
 import app_error_code
 import app_constants
 from own_firebase_admin import auth, db
 from models import user_info
 from database import token_information_operations
+from helpers import own_json
 
 #region Collection Names as CN
 is_debug = 'DEBUG' in argv
@@ -123,3 +125,74 @@ def get_user_info_by_email(email, add_extra_info = False):
     )
 
     return user_info_output
+
+def authenticate_with_credentials(email, password):
+    """authenticate with email and password in the firebase identity api rest
+
+    Args:
+        email (str): a valid email
+        password (str): a md5 hexadecimals formatted password
+
+    Raises:
+        ValueError: if the email or the password are empty or are null
+        ValueError: if the password is not good formatted
+        app_error_code.InvalidCredentialsException: if the email or password are incorrect
+        app_error_code.UserNotExistsOrDisableException: if the user does not exists or is disable
+
+    Returns:
+        tuple[str, str, user_info.UserInfo]: \n
+            [0] contains a dumped to str dictionary that contains {id_token-with the id token} and {custom_claims-dictionary with all custom claims of the id_token}
+                the values of the custom_claims are:
+                - is_verified: bool
+            
+            [1] contains a str that represent the refresh_token
+
+            [2] the whole user_info for the current id_token
+    """
+
+    if not email or not password:
+        raise ValueError('the email or the password cannot be empty or null')
+
+    if not len(password) == 32:
+        raise ValueError('the password should be hashed with md5 and convert to string with hexadecimals format')
+
+    WEB_API_KEY = app_constants.get_web_api_key()
+
+    url_sign_in_with_credentials_firebase = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={WEB_API_KEY}'
+    firebase_request_body = {
+        'email': email,
+        'password': password,
+        'returnSecureToken': True
+    }
+
+    firebase_response = requests.post(url=url_sign_in_with_credentials_firebase, json=firebase_request_body)
+
+    if not firebase_response.status_code == 200:
+        firebase_error_message = None
+        
+        try:
+            firebase_error_message = firebase_response.json()['error']['message']
+        except:
+            raise app_error_code.UnexpectedError()
+        
+        if firebase_error_message == 'EMAIL_NOT_FOUND' or firebase_error_message == 'INVALID_PASSWORD':
+            raise app_error_code.InvalidCredentialsException()
+        elif firebase_error_message == 'USER_DISABLED':
+            raise app_error_code.UserNotExistsOrDisableException()
+        else:
+            raise app_error_code.UnexpectedError()
+
+    response_body = firebase_response.json()
+
+    id_token = response_body['idToken']
+    refresh_token = response_body['refreshToken']
+    current_user_info = get_user_info_by_email(email, add_extra_info=True)
+
+    custom_id_token = own_json.dumps({
+        'id_token': id_token,
+        'custom_claims': {
+            'is_verified': current_user_info.is_verified
+        }
+    })
+
+    return (custom_id_token, refresh_token, current_user_info)

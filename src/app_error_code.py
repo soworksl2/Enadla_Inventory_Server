@@ -4,7 +4,7 @@ INVALID_CREDENTIALS = 'INVALID_CREDENTIALS'
 USER_NOT_EXISTS_OR_DISABLE = 'USER_NOT_EXISTS_OR_DISABLE'
 UNVERIFIED_USER = 'UNVERIFIED_USER'
 TOO_MANY_SIGN_UP = 'TOO_MANY_SIGN_UP'
-HTTP_BASIC_ERROR = 'HTTP_ERROR'
+HTTP_BASIC_ERROR = 'HTTP_BASIC_ERROR'
 UNEXPECTED_ERROR = 'UNEXPECTED_ERROR'
 
 #app_error_code in execption form
@@ -27,7 +27,7 @@ class UnverifiedUserException(Exception):
 class TooManySignUpException(Exception):
     pass
 
-class HTTP_BASIC_ERROR(Exception):
+class HTTPBasicErrorException(Exception):
     pass
 
 class UnexpectedError(Exception):
