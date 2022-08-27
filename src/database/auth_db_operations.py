@@ -135,7 +135,6 @@ def authenticate_with_credentials(email, password):
 
     Raises:
         ValueError: if the email or the password are empty or are null
-        ValueError: if the password is not good formatted
         app_error_code.InvalidCredentialsException: if the email or password are incorrect
         app_error_code.UserNotExistsOrDisableException: if the user does not exists or is disable
 
@@ -152,9 +151,6 @@ def authenticate_with_credentials(email, password):
 
     if not email or not password:
         raise ValueError('the email or the password cannot be empty or null')
-
-    if not len(password) == 32:
-        raise ValueError('the password should be hashed with md5 and convert to string with hexadecimals format')
 
     WEB_API_KEY = app_constants.get_web_api_key()
 

@@ -33,7 +33,7 @@ def __get_signUp_request_data():
 
     user_info_to_signUp = user_info.UserInfo.from_dict(**own_json.process_json_obj(user_info_to_signUp))
 
-    if not len(user_info_to_signUp.password) == 32:
+    if len(user_info_to_signUp.password) < 6:
         return (False, None)
 
     return (True, user_info_to_signUp)
@@ -57,6 +57,9 @@ def __get_auth_credentials_request_data():
     password = request_body.get('password', None)
 
     if not email or not password:
+        return (False, None, None)
+
+    if len(password) < 6:
         return (False, None, None)
     
     return (True, email, password)
