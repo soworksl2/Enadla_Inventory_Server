@@ -6,6 +6,8 @@ UNVERIFIED_USER = 'UNVERIFIED_USER'
 TOO_MANY_SIGN_UP = 'TOO_MANY_SIGN_UP'
 HTTP_BASIC_ERROR = 'HTTP_BASIC_ERROR'
 UNEXPECTED_ERROR = 'UNEXPECTED_ERROR'
+INVALID_CUSTOM_ID_TOKEN = 'INVALID_CUSTOM_ID_TOKEN'
+INVALID_ID_TOKEN = 'INVALID_ID_TOKEN'
 
 #app_error_code in execption form
 
@@ -31,4 +33,10 @@ class HTTPBasicErrorException(Exception):
     pass
 
 class UnexpectedError(Exception):
+    pass
+
+class InvalidCustomIdTokenException(Exception):
+    pass
+
+class InvalidIdTokenException(Exception):
     pass

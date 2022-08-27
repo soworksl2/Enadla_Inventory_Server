@@ -61,6 +61,27 @@ def __get_auth_credentials_request_data():
     
     return (True, email, password)
 
+def __get_send_email_verifiation_request_data():
+    """get and return all data in the request as send_email_verification formatted
+
+    Returns:
+        tuple[bool, str]:
+            [0] a bool indicating if the request is valid\n
+            [1] the custom_id_token from the request
+    """
+
+    if not request.is_json:
+        return (False, None)
+
+    request_body: dict = request.get_json()
+
+    custom_id_token = request_body.get('custom_id_token', None)
+
+    if not custom_id_token:
+        return (False, None)
+
+    return (True, custom_id_token)
+
 @user_info_bp.route('/', methods=['POST'])
 def sign_up():
     is_request_valid, user_info_to_signUp = __get_signUp_request_data()
@@ -122,3 +143,24 @@ def authenticate_by_credentials():
         refresh_token=refresh_token,
         user_info=current_user_info
     )
+
+@user_info_bp.route('/send_email_verification/', methods=['POST'])
+def send_email_verification():
+
+    is_request_valid, custom_id_token = __get_send_email_verifiation_request_data()
+
+    if not is_request_valid:
+        return own_response_factory.create_json_body(400, error_code=app_error_code.HTTP_BASIC_ERROR)
+
+    try:
+        auth_db_operations.send_email_verification(custom_id_token)
+    except app_error_code.InvalidCustomIdTokenException:
+        return own_response_factory.create_json_body(status=400, error_code=app_error_code.INVALID_CUSTOM_ID_TOKEN)
+    except app_error_code.InvalidIdTokenException:
+        return own_response_factory.create_json_body(status=400, error_code=app_error_code.INVALID_ID_TOKEN)
+    except app_error_code.UserNotExistsOrDisableException:
+        return own_response_factory.create_json_body(status=409, error_code=app_error_code.USER_NOT_EXISTS_OR_DISABLE)
+    except:
+        return own_response_factory.create_json_body(status=400, error_code=app_error_code.UNEXPECTED_ERROR)
+
+    return own_response_factory.create_json_body(status=200)

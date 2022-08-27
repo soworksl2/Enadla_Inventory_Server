@@ -196,3 +196,69 @@ def authenticate_with_credentials(email, password):
     })
 
     return (custom_id_token, refresh_token, current_user_info)
+
+def __process_custom_id_token(custom_id_token):
+    """extract data from the custom_id_token
+
+    Args:
+        custom_id_token (str): the custom id token
+
+    Raises:
+        app_error_code.InvalidCustomIdTokenException: if the custom id token is invalid
+        app_error_code.InvalidCustomIdTokenException: _description_
+
+    Returns:
+        tuple[str, dict]: a tuple that contains
+            [0] the id token\n
+            [2] the custom claims for the specific id token 
+    """
+
+    if not custom_id_token:
+        raise app_error_code.InvalidCustomIdTokenException()
+
+    try:
+        processed_custom_id_token = own_json.loads(custom_id_token)
+    except:
+        raise app_error_code.InvalidCustomIdTokenException()
+
+    return (processed_custom_id_token['id_token'], processed_custom_id_token['custom_claims'])
+
+def send_email_verification(custom_id_token):
+    """send an email of verificaion to a user depending on the custom_id_token (this is an wrapper for the firebase api rest option)
+
+    Args:
+        custom_id_token (str): the custom id token
+
+    Raises:
+        app_error_code.InvalidCustomIdTokenException: if the custom id token is invalid
+        app_error_code.UnexpectedError: if something unexpected goes wrong
+        app_error_code.InvalidIdTokenException: if the id token is wrong
+        app_error_code.UserNotExistsOrDisableException: if the user does not exists or is disable
+    """ 
+
+    API_WEB_KEY = app_constants.get_web_api_key()
+
+    firebase_id_token, _ = __process_custom_id_token(custom_id_token)
+
+    firebase_url_api = f'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={API_WEB_KEY}'
+    firebase_request_body = {
+        'requestType': 'VERIFY_EMAIL',
+        'idToken': firebase_id_token
+    }
+
+    firebase_response =requests.post(url=firebase_url_api, json=firebase_request_body)
+
+    if not firebase_response.status_code == 200:
+        firebase_error_message = None
+        
+        try:
+            firebase_error_message = firebase_response.json()['error']['message']
+        except:
+            raise app_error_code.UnexpectedError()
+
+        if firebase_error_message == 'INVALID_ID_TOKEN':
+            raise app_error_code.InvalidIdTokenException()
+        elif firebase_error_message == 'USER_NOT_FOUND':
+            raise app_error_code.UserNotExistsOrDisableException()
+        else:
+            raise app_error_code.UnexpectedError()
