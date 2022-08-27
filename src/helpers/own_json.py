@@ -45,6 +45,18 @@ def dumps(obj):
 
     return json.dumps(obj, default=__default_serialization)
 
+def loads(str_obj):
+    """deserialize the obj with json.loads and then call process_json_obj and return the value
+
+    Args:
+        str_obj (str): the serialized obj
+
+    Returns:
+        dict | list: the deserialized obj
+    """
+
+    return process_json_obj(json.loads(str_obj))
+
 def __process_datetime_format(datetime_str: str):
     DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
     try:

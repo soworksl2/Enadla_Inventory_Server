@@ -246,5 +246,39 @@ class TestOwnJson(unittest.TestCase):
 
     # *-*-*-*-*-*-**-***-*
 
+    #testing loads as l
+
+    def test_l_given_a_valid_serialized_obj_then_deserialize_it(self):
+        #arrange
+        serialized_obj = '{"name": "Jimy", "age": 22, "is_rich": false, "wallets": null, "cars": ["bike", "legs"]}'
+
+        #act
+        result = own_json.loads(serialized_obj)
+
+        #assert
+        expected = {
+            'name': 'Jimy',
+            'age': 22,
+            'is_rich': False,
+            'wallets': None,
+            'cars': ['bike', 'legs']
+        }
+        self.assertEqual(result, expected)
+
+    def test_l_given_some_value_with_specific_formatted_in_project_then_deserialize_it_correctly(self):
+        #arrage
+        serialized_obj = '{"date_now": "2022-07-26 19:28:45 +0000"}'
+
+        #act
+        result = own_json.loads(serialized_obj)
+
+        #assert
+        expected = {
+            'date_now': datetime.datetime(2022, 7, 26, 19, 28, 45, tzinfo=pytz.utc)
+        }
+        self.assertEqual(result, expected)
+
+    # *--**--*-*--**-*-*-*-
+
 if __name__ == '__main__':
     unittest.main()
