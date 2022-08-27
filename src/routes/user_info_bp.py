@@ -85,6 +85,20 @@ def __get_send_email_verifiation_request_data():
 
     return (True, custom_id_token)
 
+def __get_send_password_reset_email_request_data():
+    
+    if not request.is_json:
+        return (False, None)
+
+    request_body: dict = request.get_json()
+
+    email = request_body.get('email', None)
+
+    if not email:
+        return (False, None)
+
+    return (True, email)
+
 @user_info_bp.route('/', methods=['POST'])
 def sign_up():
     is_request_valid, user_info_to_signUp = __get_signUp_request_data()
@@ -165,5 +179,20 @@ def send_email_verification():
         return own_response_factory.create_json_body(status=409, error_code=app_error_code.USER_NOT_EXISTS_OR_DISABLE)
     except:
         return own_response_factory.create_json_body(status=400, error_code=app_error_code.UNEXPECTED_ERROR)
+
+    return own_response_factory.create_json_body(status=200)
+
+@user_info_bp.route('/send_password_reset_email/', methods=['POST'])
+def send_password_reset_email():
+    
+    is_request_valid, email = __get_send_password_reset_email_request_data()
+
+    if not is_request_valid:
+        return own_response_factory.create_json_body(status=400, error_code=app_error_code.HTTP_BASIC_ERROR)
+
+    try:
+        auth_db_operations.send_password_reset_email(email)
+    except:
+        return own_response_factory.create_json_body(400, error_code=app_error_code.UNEXPECTED_ERROR)
 
     return own_response_factory.create_json_body(status=200)

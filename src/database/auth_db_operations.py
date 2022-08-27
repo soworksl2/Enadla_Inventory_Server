@@ -17,6 +17,8 @@ is_debug = 'DEBUG' in argv
 CN_EXTRA_USER_INFO = 'extra_user_info' if not is_debug else 'test_extra_user_info'
 #endregion
 
+#TODO: extract API_WEB_KEY const from each method and make it a global const
+
 def __has_machine_too_many_signUp(machine_id):
     RANGE_FOR_MAX_SIGNUP = app_constants.get_range_for_max_signUp()
     MAX_SIGNUP_PER_MACHINE = app_constants.get_max_signUp_per_machine_in_range()
@@ -258,3 +260,38 @@ def send_email_verification(custom_id_token):
             raise app_error_code.UserNotExistsOrDisableException()
         else:
             raise app_error_code.UnexpectedError()
+
+def send_password_reset_email(email):
+    """send an email to recovery the password. (it is a wrapper of a endpoint firebase api)
+
+    Args:
+        email (str): the email to recovery the password
+
+    Raises:
+        app_error_code.UnexpectedError: something went wrong
+        app_error_code.UserNotExistsOrDisableException: if the email was no found
+    """
+
+    API_WEB_KEY = app_constants.get_web_api_key()
+
+    firebase_url_endPoint = f'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={API_WEB_KEY}'
+    firebase_request_body = {
+        'requestType': 'PASSWORD_RESET',
+        'email': email
+    }
+
+    firebase_response = requests.post(url=firebase_url_endPoint, json=firebase_request_body)
+
+    if not firebase_response.status_code == 200:
+        firebase_error_message = None
+        
+        try:
+            firebase_error_message = firebase_response.json()['error']['message']
+        except:
+            raise app_error_code.UnexpectedError()
+
+        if firebase_error_message == 'EMAIL_NOT_FOUND':
+            raise app_error_code.UserNotExistsOrDisableException()
+        else:
+            raise app_error_code.UnexpectedError()
+
