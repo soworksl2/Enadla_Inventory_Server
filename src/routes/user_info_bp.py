@@ -1,8 +1,7 @@
-from flask import Blueprint, request
+from flask import Blueprint
 
 import app_error_code
 from models import user_info
-from helpers import own_json
 from helpers import request_processor
 from helpers import own_response_factory
 from database import auth_db_operations
@@ -20,18 +19,12 @@ def sign_up():
         'user_info': {'type': 'dict', 'required': True}
     }
 
-    if request.is_json:
-        valid_request = request_processor.normalize_and_validate(request_specification, request.json)
-    else:
-        valid_request = None
+    valid_request = request_processor.parse_request(request_specification, {
+        'user_info**': user_info.UserInfo.from_dict
+    })
 
     if not valid_request:
-        return own_response_factory.create_json_body(
-            status=400,
-            error_code=app_error_code.HTTP_BASIC_ERROR
-        )
-
-    valid_request['user_info'] = user_info.UserInfo.from_dict(**valid_request['user_info'])
+        return own_response_factory.create_json_body(status=400, error_code=app_error_code.HTTP_BASIC_ERROR)
 
     try:
         updated_user_info = auth_db_operations.save_new_user_info(valid_request['user_info'])
@@ -67,10 +60,7 @@ def authenticate_by_credentials():
         'password': {'type': 'string', 'required': True, 'minlength': 6}
     }
 
-    if request.is_json:
-        valid_request = request_processor.normalize_and_validate(request_specification, request.json)
-    else:
-        valid_request = None
+    valid_request = request_processor.parse_request(request_specification)
 
     if not valid_request:
         return own_response_factory.create_json_body(status=400, error_code=app_error_code.HTTP_BASIC_ERROR)
@@ -100,10 +90,7 @@ def send_email_verification():
         'custom_id_token': {'type': 'string', 'required': True}
     }
 
-    if request.is_json:
-        valid_request = request_processor.normalize_and_validate(request_specification, request.json)
-    else:
-        valid_request = None
+    valid_request = request_processor.parse_request(request_specification)
 
     if not valid_request:
         return own_response_factory.create_json_body(400, error_code=app_error_code.HTTP_BASIC_ERROR)
@@ -128,10 +115,7 @@ def send_password_reset_email():
         'email': {'type': 'string', 'required': True}
     }
 
-    if request.is_json:
-        valid_request = request_processor.normalize_and_validate(request_specification, request.json)
-    else:
-        valid_request = None
+    valid_request = request_processor.parse_request(request_specification)
 
     if not valid_request:
         return own_response_factory.create_json_body(status=400, error_code=app_error_code.HTTP_BASIC_ERROR)
