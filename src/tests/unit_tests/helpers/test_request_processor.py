@@ -1,0 +1,82 @@
+import os
+import sys
+import unittest
+from unittest import result
+
+#region adding the project path to the sys.path
+directory = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(os.path.dirname(directory))
+parent = os.path.dirname(parent)
+sys.path.append(parent)
+#endregion
+
+from helpers import request_processor
+
+class TestRequestProcessor(unittest.TestCase):
+
+    # testing normalize and validate as nv
+
+    def test_nv_given_valid_request_then_return_a_copy(self):
+        #arrange
+        request_sim_schema = {
+            'name': {'type': 'string', 'required': True},
+            'last_name': {'type': 'string', 'required': True}
+        }
+
+        request_sim = {
+            'name': 'jimy',
+            'last_name': 'Aguasviva'
+        }
+
+        #act
+        result = request_processor.normalize_and_validate(request_sim_schema, request_sim)
+
+        #assert
+        expected = {
+            'name': 'jimy',
+            'last_name': 'Aguasviva'
+        }
+        self.assertEqual(result, expected)
+
+    def test_nv_given_required_field_no_passed_then_no_valid(self):
+       #arrange
+        request_sim_schema = {
+            'name': {'type': 'string', 'required': True},
+            'last_name': {'type': 'string', 'required': True}
+        }
+
+        request_sim = {
+            'name': 'jimy'
+        } 
+
+        #act
+        result = request_processor.normalize_and_validate(request_sim_schema, request_sim)
+
+        #assert
+        self.assertIsNone(result)
+
+    def test_nv_given_no_normalized_request_then_normalize_it(self):
+        #arrange
+        request_sim_schema = {
+            'name': {'type': 'string', 'required': True},
+            'last_name': {'type': 'string', 'default': ''}
+        }
+
+        request_sim = {
+            'name': 'jimy'
+        }
+
+        #act
+        result = request_processor.normalize_and_validate(request_sim_schema, request_sim)
+
+        #assert
+        expected = {
+            'name': 'jimy',
+            'last_name': ''
+        }
+        self.assertEqual(result, expected)
+
+    # *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+if __name__ == '__main__':
+    unittest.main()
