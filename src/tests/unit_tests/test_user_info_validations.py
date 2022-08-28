@@ -97,6 +97,18 @@ class TestUserInfoValidations(unittest.TestCase):
                 self.assertFalse(result[0])
                 self.assertIn(user_info.ValidationFails.empty_password, result[1])
 
+    def test_su_given_short_password_then_short_password_fail(self):
+        #arrange
+        user = self.get_good_user_info()
+        user.password = '12345'
+
+        #act
+        result = user_info.validate(user, user_info.R_SIGNUP)
+
+        #assert
+        self.assertFalse(result[0])
+        self.assertIn(user_info.ValidationFails.short_password, result[1])
+
     def test_su_given_empty_owner_name_then_empty_owner_name_fail(self):
 
         for owner_name in self.get_posibles_empty_strings():

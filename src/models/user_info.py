@@ -57,10 +57,11 @@ class ValidationFails(Enum):
     empty_email = 0
     invalid_email = 1
     empty_password = 2
-    empty_owner_name = 3
-    short_owner_name = 4
-    long_owner_name = 5
-    empty_creator_machine = 6
+    short_password = 3
+    empty_owner_name = 4
+    short_owner_name = 5
+    long_owner_name = 6
+    empty_creator_machine = 7
 
 def __has_extra_info(user_info):
     return isinstance(user_info.extra_info, ExtraUserInfo)
@@ -77,6 +78,9 @@ def __sign_up_validation(user_info: UserInfo):
 
     if v.is_empty_str(user_info.password):
         fails.append(ValidationFails.empty_password)
+
+    if not v.len_min(6, user_info.password):
+        fails.append(ValidationFails.short_password)
 
     if v.is_empty_str(user_info.owner_name):
         fails.append(ValidationFails.empty_owner_name)

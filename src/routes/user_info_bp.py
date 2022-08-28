@@ -3,6 +3,7 @@ from flask import Blueprint, request
 import app_error_code
 from models import user_info
 from helpers import own_json
+from helpers import request_processor
 from helpers import own_response_factory
 from database import auth_db_operations
 
@@ -13,104 +14,27 @@ UPDATED_USER_INFO_KEY = 'updated_user_info'
 
 user_info_bp = Blueprint('accounts', __name__)
 
-def __get_signUp_request_data():
-    """get and returns all the data in a request signup formatted
-
-    Returns:
-        tuple[bool, UserInfo]: 
-            [0] is a bool that indicate wheter the request is good formatted.\n
-            [1] is a UserInfo to signup or None if something goes wrong
-    """
-
-    if not request.is_json:
-        return (False, None)
-
-    request_body: dict = request.get_json()
-    user_info_to_signUp = request_body.get(USER_INFO_KEY, None)
-
-    if user_info_to_signUp is None:
-        return (False, None)
-
-    user_info_to_signUp = user_info.UserInfo.from_dict(**own_json.process_json_obj(user_info_to_signUp))
-
-    if len(user_info_to_signUp.password) < 6:
-        return (False, None)
-
-    return (True, user_info_to_signUp)
-
-def __get_auth_credentials_request_data():
-    """get and return all the data in a request auth formatted
-
-    Returns:
-        tuple[bool, str, str]:
-            [0] if the request is valid\n
-            [1] the email if is correct\n
-            [2] the password if is correct
-    """
-
-    if not request.is_json:
-        return (False, None, None)
-
-    request_body: dict = request.get_json()
-
-    email = request_body.get('email', None)
-    password = request_body.get('password', None)
-
-    if not email or not password:
-        return (False, None, None)
-
-    if len(password) < 6:
-        return (False, None, None)
-    
-    return (True, email, password)
-
-def __get_send_email_verifiation_request_data():
-    """get and return all data in the request as send_email_verification formatted
-
-    Returns:
-        tuple[bool, str]:
-            [0] a bool indicating if the request is valid\n
-            [1] the custom_id_token from the request
-    """
-
-    if not request.is_json:
-        return (False, None)
-
-    request_body: dict = request.get_json()
-
-    custom_id_token = request_body.get('custom_id_token', None)
-
-    if not custom_id_token:
-        return (False, None)
-
-    return (True, custom_id_token)
-
-def __get_send_password_reset_email_request_data():
-    
-    if not request.is_json:
-        return (False, None)
-
-    request_body: dict = request.get_json()
-
-    email = request_body.get('email', None)
-
-    if not email:
-        return (False, None)
-
-    return (True, email)
-
 @user_info_bp.route('/', methods=['POST'])
 def sign_up():
-    is_request_valid, user_info_to_signUp = __get_signUp_request_data()
+    request_specification = {
+        'user_info': {'type': 'dict', 'required': True}
+    }
 
-    if not is_request_valid:
+    if request.is_json:
+        valid_request = request_processor.normalize_and_validate(request_specification, request.json)
+    else:
+        valid_request = None
+
+    if not valid_request:
         return own_response_factory.create_json_body(
             status=400,
             error_code=app_error_code.HTTP_BASIC_ERROR
         )
 
+    valid_request['user_info'] = user_info.UserInfo.from_dict(**valid_request['user_info'])
+
     try:
-        updated_user_info = auth_db_operations.save_new_user_info(user_info_to_signUp)
+        updated_user_info = auth_db_operations.save_new_user_info(valid_request['user_info'])
     
     except app_error_code.InvalidUserinfoException:
         return own_response_factory.create_json_body(
@@ -138,13 +62,21 @@ def sign_up():
 @user_info_bp.route('/auth/', methods=['GET'])
 def authenticate_by_credentials():
 
-    is_valid_request, email, password = __get_auth_credentials_request_data()
+    request_specification = {
+        'email': {'type': 'string', 'required': True},
+        'password': {'type': 'string', 'required': True, 'minlength': 6}
+    }
 
-    if not is_valid_request:
-        return own_response_factory.create_json_body(400, error_code=app_error_code.HTTP_BASIC_ERROR)
+    if request.is_json:
+        valid_request = request_processor.normalize_and_validate(request_specification, request.json)
+    else:
+        valid_request = None
+
+    if not valid_request:
+        return own_response_factory.create_json_body(status=400, error_code=app_error_code.HTTP_BASIC_ERROR)
 
     try:
-        custom_id_token, refresh_token, current_user_info = auth_db_operations.authenticate_with_credentials(email, password)
+        custom_id_token, refresh_token, current_user_info = auth_db_operations.authenticate_with_credentials(valid_request['email'], valid_request['password'])
     except ValueError:
         return own_response_factory.create_json_body(400, error_code=app_error_code.HTTP_BASIC_ERROR)
     except app_error_code.InvalidCredentialsException:
@@ -164,13 +96,20 @@ def authenticate_by_credentials():
 @user_info_bp.route('/send_email_verification/', methods=['POST'])
 def send_email_verification():
 
-    is_request_valid, custom_id_token = __get_send_email_verifiation_request_data()
+    request_specification = {
+        'custom_id_token': {'type': 'string', 'required': True}
+    }
 
-    if not is_request_valid:
+    if request.is_json:
+        valid_request = request_processor.normalize_and_validate(request_specification, request.json)
+    else:
+        valid_request = None
+
+    if not valid_request:
         return own_response_factory.create_json_body(400, error_code=app_error_code.HTTP_BASIC_ERROR)
 
     try:
-        auth_db_operations.send_email_verification(custom_id_token)
+        auth_db_operations.send_email_verification(valid_request['custom_id_token'])
     except app_error_code.InvalidCustomIdTokenException:
         return own_response_factory.create_json_body(status=400, error_code=app_error_code.INVALID_CUSTOM_ID_TOKEN)
     except app_error_code.InvalidIdTokenException:
@@ -185,13 +124,20 @@ def send_email_verification():
 @user_info_bp.route('/send_password_reset_email/', methods=['POST'])
 def send_password_reset_email():
     
-    is_request_valid, email = __get_send_password_reset_email_request_data()
+    request_specification = {
+        'email': {'type': 'string', 'required': True}
+    }
 
-    if not is_request_valid:
+    if request.is_json:
+        valid_request = request_processor.normalize_and_validate(request_specification, request.json)
+    else:
+        valid_request = None
+
+    if not valid_request:
         return own_response_factory.create_json_body(status=400, error_code=app_error_code.HTTP_BASIC_ERROR)
 
     try:
-        auth_db_operations.send_password_reset_email(email)
+        auth_db_operations.send_password_reset_email(valid_request['email'])
     except:
         return own_response_factory.create_json_body(400, error_code=app_error_code.UNEXPECTED_ERROR)
 
