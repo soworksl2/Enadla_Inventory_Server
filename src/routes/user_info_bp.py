@@ -6,11 +6,6 @@ from helpers import request_processor
 from helpers import own_response_factory
 from database import auth_db_operations
 
-#region constant keys for the body requests or response that use this BluePrint
-USER_INFO_KEY = 'user_info'
-UPDATED_USER_INFO_KEY = 'updated_user_info'
-#endregion
-
 user_info_bp = Blueprint('accounts', __name__)
 
 @user_info_bp.route('/', methods=['POST'])
