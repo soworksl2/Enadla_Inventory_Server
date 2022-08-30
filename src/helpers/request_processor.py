@@ -1,6 +1,8 @@
 from flask import request
 from cerberus import Validator
 
+from helpers import own_json
+
 class _RequestValidator(Validator):
     pass
 
@@ -14,35 +16,42 @@ def normalize_and_validate(schema, request_dict):
     else:
         return None
 
-def parse_request(specification, field_converter = None):
-    if request.is_json:
-        valid_request = normalize_and_validate(specification, request.json)
-    else:
-        return None
-
-    if not field_converter or not valid_request:
-        return valid_request
-
-    if not isinstance(field_converter, dict):
-        raise TypeError('field_converter should be a dictionary')
-
-    for key, value in field_converter.items():
-        str_paths = [path.strip() for path in key.split('.')]
-
-        if not all(str_paths):
-            continue
-
-        nested_dict: dict = valid_request
-        for i in range(0, len(str_paths)):
-            if not str_paths[i] in nested_dict:
-                break
-
-            if i == len(str_paths) - 1:
-                if str_paths[i].endswith('**'):
-                    nested_dict[str_paths[i]] = value(**nested_dict[str_paths[i]])
-                else:
-                    nested_dict[str_paths[i]] = value(nested_dict[str_paths[i]])
-            else:
-                nested_dict = nested_dict[str_paths[i]]
+def __convert_fields_of_dict(dict_to_convert, fields_converter):
     
+    if not fields_converter or not isinstance(fields_converter, dict):
+        raise TypeError('fields_converter should be a dict')
+
+    for key in fields_converter.keys():
+        if not isinstance(key, str):
+            raise TypeError('each key of fields_converter dict should be a string')
+
+    for full_path, converter in fields_converter.items():
+        specific_dict_location = dict_to_convert
+        path_splitted = full_path.split('.')
+        last_path_index = len(path_splitted) - 1
+
+        for index, path in enumerate(path_splitted):
+            if index == last_path_index:
+                if path.endswith('**'):
+                    path_without_last_asterisks = path[:-2]
+                    specific_dict_location[path_without_last_asterisks] = converter(**specific_dict_location[path_without_last_asterisks])
+                else:
+                    specific_dict_location[path] = converter(specific_dict_location[path])
+            else:
+                specific_dict_location = specific_dict_location[path]
+
+def parse_request(specification, fields_converter = None):
+    if not request.is_json:
+        return (False, None)
+    
+    valid_request = normalize_and_validate(specification, request.json)
+
+    if not valid_request:
+        return (False, None)
+
+    valid_request = own_json.process_json_obj(valid_request)
+
+    if fields_converter:
+        __convert_fields_of_dict(valid_request, fields_converter)
+
     return valid_request
