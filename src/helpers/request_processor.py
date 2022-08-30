@@ -1,3 +1,6 @@
+import hashlib
+import json
+
 from flask import request
 from cerberus import Validator
 
@@ -40,13 +43,64 @@ def __convert_fields_of_dict(dict_to_convert, fields_converter):
             else:
                 specific_dict_location = specific_dict_location[path]
 
+#region calculation of sfls
+
+def __calculate_slfs(request):
+    if 'slfs' in request:
+        raise ValueError('the request should no contains a slfs key')
+
+    md5_alg = hashlib.md5()
+
+    lt = request['lt']
+    md5_alg.update(lt.encode('utf-8'))
+    lt = md5_alg.hexdigest()
+
+    request['lt'] = lt
+
+    md5_alg = hashlib.md5()
+
+    dumped = json.dumps(request)
+    md5_alg.update(dumped.encode('utf-8'))
+    return md5_alg.hexdigest()
+
+#endregion
+
+def __request_have_valid_SLFS(request):
+    if not 'slfs' in request or not 'lt' in request:
+        return False
+
+    request_without_slfs = request.copy()
+    del request_without_slfs['slfs']
+
+    correct_slfs = __calculate_slfs(request_without_slfs)
+
+    return request['slfs'] == correct_slfs
+
 def parse_request(specification, fields_converter = None):
+    """take the flask's request obj and parse it with the business logic to return it.
+
+    Args:
+        specification (dict[str, any]): a dictionary that contains the specification of how parse the request and when it will be invalid (cerberus api)
+        fields_converter (dict[str, any], optional): a dictionary that contains in the keys the path dotted notation of where in the request dict you wanna convert and in the value a function that accept the current value and transfomr it. Defaults to None.
+
+    Returns:
+        tuple[bool, dict]: returns a tuple
+            [0] contains if the request is valid\n
+            [1] contains the parsed request if is valid. otherwise will be None
+    """
+    
     if not request.is_json:
         return (False, None)
-    
+
+    specification['lt'] = {'type': 'string', 'required': True}
+    specification['slfs'] = {'type': 'string', 'required': True}
+
     valid_request = normalize_and_validate(specification, request.json)
 
     if not valid_request:
+        return (False, None)
+
+    if not __request_have_valid_SLFS(valid_request):
         return (False, None)
 
     valid_request = own_json.process_json_obj(valid_request)
@@ -54,4 +108,4 @@ def parse_request(specification, fields_converter = None):
     if fields_converter:
         __convert_fields_of_dict(valid_request, fields_converter)
 
-    return valid_request
+    return (True, valid_request)

@@ -14,11 +14,11 @@ def sign_up():
         'user_info': {'type': 'dict', 'required': True}
     }
 
-    valid_request = request_processor.parse_request(request_specification, {
+    is_valid_request, valid_request = request_processor.parse_request(request_specification, {
         'user_info**': user_info.UserInfo.from_dict
     })
 
-    if not valid_request:
+    if not is_valid_request:
         return own_response_factory.create_json_body(status=400, error_code=app_error_code.HTTP_BASIC_ERROR)
 
     try:
@@ -55,9 +55,9 @@ def authenticate_by_credentials():
         'password': {'type': 'string', 'required': True, 'minlength': 6}
     }
 
-    valid_request = request_processor.parse_request(request_specification)
+    is_valid_request, valid_request = request_processor.parse_request(request_specification)
 
-    if not valid_request:
+    if not is_valid_request:
         return own_response_factory.create_json_body(status=400, error_code=app_error_code.HTTP_BASIC_ERROR)
 
     try:
@@ -85,9 +85,9 @@ def send_email_verification():
         'custom_id_token': {'type': 'string', 'required': True}
     }
 
-    valid_request = request_processor.parse_request(request_specification)
+    is_valid_request, valid_request = request_processor.parse_request(request_specification)
 
-    if not valid_request:
+    if not is_valid_request:
         return own_response_factory.create_json_body(400, error_code=app_error_code.HTTP_BASIC_ERROR)
 
     try:
@@ -110,9 +110,9 @@ def send_password_reset_email():
         'email': {'type': 'string', 'required': True}
     }
 
-    valid_request = request_processor.parse_request(request_specification)
+    is_valid_request, valid_request = request_processor.parse_request(request_specification)
 
-    if not valid_request:
+    if not is_valid_request:
         return own_response_factory.create_json_body(status=400, error_code=app_error_code.HTTP_BASIC_ERROR)
 
     try:
