@@ -1,5 +1,6 @@
 import hashlib
 import json
+from multiprocessing.sharedctypes import Value
 
 from flask import request
 from cerberus import Validator
@@ -45,22 +46,44 @@ def __convert_fields_of_dict(dict_to_convert, fields_converter):
 
 #region calculation of sfls
 
-def __calculate_slfs(request):
+def __convert_dict_data(data):
+    if isinstance(data, str):
+        yield data
+    elif isinstance(data, bool):
+        yield '1' if data else '0'
+    elif isinstance(data, int) or isinstance(data, float):
+        yield str(data)
+    elif data is None:
+        pass
+    elif isinstance(data, list):
+        for element in data:
+            for generator_element in __convert_dict_data(element):
+                yield generator_element
+    elif isinstance(data, dict):
+        for key, value in sorted(data.items()):
+            if not isinstance(key, str):
+                raise TypeError("all the dictionay should be key string")
+            
+            yield key
+            for generator_element in __convert_dict_data(value):
+                yield generator_element
+    else:
+        raise ValueError('type not supported')
+
+def __calculate_slfs(request: dict):
     if 'slfs' in request:
         raise ValueError('the request should no contains a slfs key')
 
-    md5_alg = hashlib.md5()
+    plain_slfs_tokens = []
 
-    lt = request['lt']
-    md5_alg.update(lt.encode('utf-8'))
-    lt = md5_alg.hexdigest()
-
-    request['lt'] = lt
+    for token in __convert_dict_data(request):
+        plain_slfs_tokens.append(token)
 
     md5_alg = hashlib.md5()
+    
+    for slfs_tokens in plain_slfs_tokens:
+        md5_alg.update(slfs_tokens.encode('utf-8'))
 
-    dumped = json.dumps(request)
-    md5_alg.update(dumped.encode('utf-8'))
     return md5_alg.hexdigest()
 
 #endregion
