@@ -2,8 +2,7 @@ from flask import Blueprint
 
 import app_error_code
 from models import user_info
-from helpers import request_processor
-from helpers import own_response_factory
+from helpers import request_processor, own_response_factory
 from database import auth_db_operations
 
 user_info_bp = Blueprint('accounts', __name__)
