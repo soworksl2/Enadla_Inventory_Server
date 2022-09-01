@@ -220,6 +220,19 @@ def process_custom_id_token(custom_id_token):
 
     return (processed_custom_id_token['id_token'], processed_custom_id_token['custom_claims'])
 
+def verify_firebase_id_token(firebase_id_token, check_revoked=False):
+    """it is a wraper for the firebase auth.verify_id_token, see te documentation on firebase
+
+    Args:
+        firebase_id_token (str): the firebase_id_token
+        check_revoked (bool, optional): if check revoked
+
+    Returns:
+        dict: the decoded token
+    """
+
+    return auth.verify_id_token(firebase_id_token, check_revoked=check_revoked)
+
 def send_email_verification(custom_id_token):
     """send an email of verificaion to a user depending on the custom_id_token (this is an wrapper for the firebase api rest option)
 
