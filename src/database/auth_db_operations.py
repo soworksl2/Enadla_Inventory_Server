@@ -203,7 +203,6 @@ def process_custom_id_token(custom_id_token):
 
     Raises:
         app_error_code.InvalidCustomIdTokenException: if the custom id token is invalid
-        app_error_code.InvalidCustomIdTokenException: _description_
 
     Returns:
         tuple[str, dict]: a tuple that contains
