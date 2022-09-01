@@ -195,7 +195,7 @@ def authenticate_with_credentials(email, password):
 
     return (custom_id_token, refresh_token, current_user_info)
 
-def __process_custom_id_token(custom_id_token):
+def process_custom_id_token(custom_id_token):
     """extract data from the custom_id_token
 
     Args:
@@ -236,7 +236,7 @@ def send_email_verification(custom_id_token):
 
     API_WEB_KEY = app_constants.get_web_api_key()
 
-    firebase_id_token, _ = __process_custom_id_token(custom_id_token)
+    firebase_id_token, _ = process_custom_id_token(custom_id_token)
 
     firebase_url_api = f'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={API_WEB_KEY}'
     firebase_request_body = {
