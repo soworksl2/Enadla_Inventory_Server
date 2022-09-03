@@ -25,9 +25,18 @@ def __get_token_information_SnapShot_by_id(user_info_id):
     
     return token_informations_ref[0]
 
+def get_token_information_by_id(user_info_id):
+    current_token_information_snapshot = __get_token_information_SnapShot_by_id(user_info_id)
+
+    return token_information.TokenInformation(
+        user_info_id=current_token_information_snapshot.get('user_info_id'),
+        amount_of_tokens=current_token_information_snapshot.get('amount_of_tokens'),
+        datetime_last_token_recharge=current_token_information_snapshot.get('datetime_last_token_recharge')
+    )
+
 def recharge_tokens(user_info_id, amount_to_recharge):
     if(amount_to_recharge < 0):
-        raise ValueError('the amount_to_recharge shoul be greather or equals than 0')
+        raise ValueError('the amount_to_recharge should be greather or equals than 0')
 
     token_information_SnapShot = __get_token_information_SnapShot_by_id(user_info_id)
     current_amount_of_tokens = token_information_SnapShot.get('amount_of_tokens')

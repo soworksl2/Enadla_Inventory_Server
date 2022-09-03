@@ -72,6 +72,9 @@ def __calculate_slfs(request: dict):
     if 'slfs' in request:
         raise ValueError('the request should no contains a slfs key')
 
+    if not 'lt' in request:
+        raise ValueError('the request should contains a lt key')
+
     plain_slfs_tokens = []
 
     for token in __convert_dict_data(request):
