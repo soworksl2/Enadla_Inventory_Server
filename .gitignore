@@ -4,4 +4,6 @@ Scripts
 pyvenv.cfg
 startServer.bat
 
+.vscode
+
 **/__pycache__
