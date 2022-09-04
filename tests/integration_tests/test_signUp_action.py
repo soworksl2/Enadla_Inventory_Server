@@ -12,14 +12,21 @@ src_path = os.path.join(root_path, 'src')
 sys.path.append(src_path)
 #endregion
 
+from app import app_server
+
 import helper
 import app_error_code
 from helper import clear_firebase_operations, faker_user_info_data
 
-SIGNUP_ACTION_URL = 'http://127.0.0.1:8080/accounts/'
-
 class TestSignUpAction(unittest.TestCase):
     
+    @classmethod
+    def setUpClass(cls):
+        app_server.config.update({
+            "TESTING": True
+        })
+        cls.flask_test_client = app_server.test_client()
+
     def tearDown(self) -> None:
         clear_firebase_operations.clear_tests_from_auth_db()
         clear_firebase_operations.clear_tests_collecion_from_firestore()
@@ -34,8 +41,8 @@ class TestSignUpAction(unittest.TestCase):
         request_body['slfs'] = 'wrong_slfs'
 
         #act
-        r = requests.post(url=SIGNUP_ACTION_URL,json=request_body)
-        
+        r = self.flask_test_client.post('/accounts/', json=request_body)
+
         #assert
         self.assertEqual(r.status_code, 400)
 
@@ -50,10 +57,10 @@ class TestSignUpAction(unittest.TestCase):
         })
 
         #act
-        r = requests.post(url=SIGNUP_ACTION_URL, json=request_body)
+        r = self.flask_test_client.post('/accounts/', json=request_body)
 
         #assert
-        error_code = r.json()['error_code']
+        error_code = r.json['error_code']
 
         self.assertEqual(r.status_code, 400)
         self.assertEqual(error_code, app_error_code.INVALID_USERINFO)
@@ -63,11 +70,11 @@ class TestSignUpAction(unittest.TestCase):
         request_body = helper.process_and_add_slfs({'user_info': faker_user_info_data.generate_good_user_info(email_number=2)})
 
         #act
-        requests.post(url=SIGNUP_ACTION_URL, json=request_body)
-        r = requests.post(url=SIGNUP_ACTION_URL, json=request_body)
+        self.flask_test_client.post('/accounts/', json=request_body)
+        r = self.flask_test_client.post('/accounts/', json=request_body)
 
         #assert
-        error_code = r.json()['error_code']
+        error_code = r.json['error_code']
 
         self.assertEqual(error_code, app_error_code.EMAIL_CONFLICT)
 
