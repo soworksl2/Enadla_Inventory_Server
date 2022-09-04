@@ -2,7 +2,9 @@ Include
 Lib
 Scripts
 pyvenv.cfg
+
 startServer.bat
+ActivateVenv.bat
 
 .vscode
 
