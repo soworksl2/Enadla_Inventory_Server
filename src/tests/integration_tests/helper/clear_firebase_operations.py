@@ -2,7 +2,7 @@
 """
 
 from own_firebase_admin import auth, db
-from tests.integration_tests.helpers import faker_user_info_data
+from helper import faker_user_info_data
 
 def clear_tests_from_auth_db():
     """Clean all test user_info from the auth firebase db

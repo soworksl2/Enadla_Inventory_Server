@@ -35,3 +35,13 @@ def get_all_test_email():
 
     for i in range(MIN_EMAIL_TEST_NUMBER, MAX_EMAIL_TEST_NUMBER + 1):
         yield get_test_email(i)
+
+def generate_good_user_info(email_number=1):
+    return {
+        'email': get_test_email(email_number),
+        'password': '123456',
+        'owner_name': 'test',
+        'extra_info': {
+            'creator_machine': 'test_machine'
+        }
+    }
