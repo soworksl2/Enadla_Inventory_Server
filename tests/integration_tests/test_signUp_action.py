@@ -4,11 +4,12 @@ import unittest
 
 import requests
 
-#region adding the project path to the sys.path
-directory = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(directory)
-parent = os.path.dirname(parent)
-sys.path.append(parent)
+#region adding src folder to sys.path
+root_path = os.path.dirname(os.path.realpath(__file__))
+root_path = os.path.dirname(root_path)
+root_path = os.path.dirname(root_path)
+src_path = os.path.join(root_path, 'src')
+sys.path.append(src_path)
 #endregion
 
 import helper

@@ -2,9 +2,13 @@ import os
 import sys
 import unittest
 
-directory = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(os.path.dirname(directory))
-sys.path.append(parent)
+#region adding src folder to sys.path
+root_path = os.path.dirname(os.path.realpath(__file__))
+root_path = os.path.dirname(root_path)
+root_path = os.path.dirname(root_path)
+src_path = os.path.join(root_path, 'src')
+sys.path.append(src_path)
+#endregion
 
 from models import user_info
 
@@ -178,7 +182,6 @@ class TestUserInfoValidations(unittest.TestCase):
                 #assert
                 self.assertFalse(result[0])
                 self.assertIn(user_info.ValidationFails.empty_creator_machine, result[1])
-
 
     #-----------------------
 
