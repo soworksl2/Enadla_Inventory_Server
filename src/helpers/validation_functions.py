@@ -35,7 +35,7 @@ def is_valid_email(email):
     if email is None or not isinstance(email, str):
         return False
 
-    EMAIL_REGEX = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+    EMAIL_REGEX = "([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])"
 
     if re.search(EMAIL_REGEX,email):   
         return True  
