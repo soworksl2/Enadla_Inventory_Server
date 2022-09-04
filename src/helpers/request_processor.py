@@ -68,7 +68,7 @@ def __convert_dict_data(data):
     else:
         raise ValueError('type not supported')
 
-def __calculate_slfs(request: dict):
+def calculate_slfs(request: dict):
     if 'slfs' in request:
         raise ValueError('the request should no contains a slfs key')
 
@@ -96,7 +96,7 @@ def __request_have_valid_SLFS(request):
     request_without_slfs = request.copy()
     del request_without_slfs['slfs']
 
-    correct_slfs = __calculate_slfs(request_without_slfs)
+    correct_slfs = calculate_slfs(request_without_slfs)
 
     return request['slfs'] == correct_slfs
 
