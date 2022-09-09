@@ -50,6 +50,7 @@ def sign_up():
 def authenticate_by_credentials():
 
     request_specification = {
+        'machine_id': {'type': 'string', 'required': True},
         'email': {'type': 'string', 'required': True},
         'password': {'type': 'string', 'required': True, 'minlength': 6}
     }
@@ -60,13 +61,15 @@ def authenticate_by_credentials():
         return own_response_factory.create_json_body(status=400, error_code=app_error_code.HTTP_BASIC_ERROR)
 
     try:
-        custom_id_token, refresh_token, current_user_info = auth_db_operations.authenticate_with_credentials(valid_request['email'], valid_request['password'])
+        custom_id_token, refresh_token, current_user_info = auth_db_operations.authenticate_with_credentials(valid_request['email'], valid_request['password'], valid_request['machine_id'])
     except ValueError:
         return own_response_factory.create_json_body(400, error_code=app_error_code.HTTP_BASIC_ERROR)
     except app_error_code.InvalidCredentialsException:
         return own_response_factory.create_json_body(400, error_code=app_error_code.INVALID_CREDENTIALS)
     except app_error_code.UserNotExistsOrDisableException:
         return own_response_factory.create_json_body(409, error_code=app_error_code.USER_NOT_EXISTS_OR_DISABLE)
+    except app_error_code.LockedMachineException:
+        return own_response_factory.create_json_body(409, error_code=app_error_code.LOCKED_MACHINE)
     except Exception as e:
         return own_response_factory.create_json_body(400, error_code=app_error_code.UNEXPECTED_ERROR)
 

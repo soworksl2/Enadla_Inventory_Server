@@ -8,7 +8,7 @@ import app_error_code
 import app_constants
 from own_firebase_admin import auth, db
 from models import user_info
-from database import token_information_operations
+from database import token_information_operations, machine_links_operations
 from helpers import own_json
 
 #region Collection Names as CN
@@ -128,7 +128,7 @@ def get_user_info_by_email(email, add_extra_info = False):
 
     return user_info_output
 
-def authenticate_with_credentials(email, password):
+def authenticate_with_credentials(email, password, machine_id):
     """authenticate with email and password in the firebase identity api rest
 
     Args:
@@ -151,8 +151,13 @@ def authenticate_with_credentials(email, password):
             [2] the whole user_info for the current id_token
     """
 
-    if not email or not password:
-        raise ValueError('the email or the password cannot be empty or null')
+    if not email or not password or not machine_id:
+        raise ValueError('the email, machine_id or the password cannot be empty or null')
+
+    machine_email_locker = machine_links_operations.get_locker(machine_id)
+
+    if machine_email_locker is not None and not machine_email_locker == email:
+        raise app_error_code.LockedMachineException()
 
     WEB_API_KEY = app_constants.get_web_api_key()
 
@@ -179,6 +184,8 @@ def authenticate_with_credentials(email, password):
             raise app_error_code.UserNotExistsOrDisableException()
         else:
             raise app_error_code.UnexpectedError()
+
+    machine_links_operations.create_link(machine_id, email)
 
     response_body = firebase_response.json()
 

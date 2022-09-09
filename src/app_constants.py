@@ -77,3 +77,15 @@ def get_last_compatible_client_version():
         raise ValueError('LAST_COMPATIBLE_CLIENT_VERSION')
 
     return (major, minor, patch)
+
+def get_machine_link_locked_time():
+    """return the time in days that a machina can be locked upto it can be updated
+
+    Returns:
+        int: the time in dayss that a machine can be locked
+    """
+
+    output = os.environ['MACHINE_LINK_LOCKED_TIME']
+    output = int(output)
+
+    return output

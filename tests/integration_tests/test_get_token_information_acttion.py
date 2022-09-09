@@ -18,7 +18,7 @@ from own_firebase_admin import auth
 import helper
 import app_error_code
 import app_constants
-from helper import clear_firebase_operations, faker_user_info_data
+from helper import clear_firebase_operations, database_helper
 
 class TestGetTokenInformationAction(unittest.TestCase):
 
@@ -38,33 +38,12 @@ class TestGetTokenInformationAction(unittest.TestCase):
 
         return super().tearDown()
 
-    def create_new_user_info(self, email_number = 1, force_verified = True):
-        request_body = helper.process_and_add_slfs({
-            'user_info': faker_user_info_data.generate_good_user_info(email_number)
-        })
-
-        r = self.flask_test_client.post('/accounts/', json=request_body)
-        uid = r.json['updated_user_info']['uid']
-
-        auth.update_user(uid, email_verified=True)
-
-    def get_custom_id_token(self, email_number = 1):
-        user_info_regisered = faker_user_info_data.generate_good_user_info(email_number)
-        request_body = helper.process_and_add_slfs({
-            'email': user_info_regisered['email'],
-            'password': user_info_regisered['password']
-        })
-
-        r = self.flask_test_client.get('/accounts/auth/', json=request_body)
-
-        return r.json['custom_id_token']
-
     #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* tests -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
     def test_given_wrong_slfs_then_error_code_is_HTTP_BASIC_ERROR(self):
         #arrange
-        self.create_new_user_info()
-        custom_id_token = self.get_custom_id_token()
+        database_helper.signUp(self.flask_test_client,  force_is_verified=True)
+        custom_id_token, _, _ = database_helper.authenticate(self.flask_test_client)
         request_body = {
             'custom_id_token': custom_id_token,
             'lt': 'test',
@@ -82,8 +61,8 @@ class TestGetTokenInformationAction(unittest.TestCase):
 
     def test_given_no_slfs_then_error_code_is_HTTP_BASIC_ERROR(self):
         #arrange
-        self.create_new_user_info()
-        custom_id_token = self.get_custom_id_token()
+        database_helper.signUp(self.flask_test_client, force_is_verified=True)
+        custom_id_token, _, _ = database_helper.authenticate(self.flask_test_client)
         request_body = {
             'custom_id_token': custom_id_token
         }
@@ -99,8 +78,8 @@ class TestGetTokenInformationAction(unittest.TestCase):
 
     def test_given_valid_request_then_return_token_information(self):
         #arrange
-        self.create_new_user_info(1)
-        custom_id_token = self.get_custom_id_token(1)
+        database_helper.signUp(self.flask_test_client, email_number=1, force_is_verified=True)
+        custom_id_token, _, _ = database_helper.authenticate(self.flask_test_client, 1)
         request_body = helper.process_and_add_slfs({
             'custom_id_token': custom_id_token
         })

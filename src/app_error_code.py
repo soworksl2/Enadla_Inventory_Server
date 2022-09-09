@@ -8,6 +8,7 @@ HTTP_BASIC_ERROR = 'HTTP_BASIC_ERROR'
 UNEXPECTED_ERROR = 'UNEXPECTED_ERROR'
 INVALID_CUSTOM_ID_TOKEN = 'INVALID_CUSTOM_ID_TOKEN'
 INVALID_ID_TOKEN = 'INVALID_ID_TOKEN'
+LOCKED_MACHINE = 'LOCKED_MACHINE'
 
 #app_error_code in execption form
 
@@ -39,4 +40,7 @@ class InvalidCustomIdTokenException(Exception):
     pass
 
 class InvalidIdTokenException(Exception):
+    pass
+
+class LockedMachineException(Exception):
     pass
