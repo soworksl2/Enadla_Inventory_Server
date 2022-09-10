@@ -80,6 +80,12 @@ def authenticate_by_credentials():
         user_info=current_user_info
     )
 
+@user_info_bp.route('/refresh_custom_id_token/', methods=['GET'])
+def authenticate_by_refresh_token():
+    #should be almost equals to authenticate by credentials but without
+    #email and address and using the refresh token instead
+    raise NotImplementedError()
+
 @user_info_bp.route('/send_email_verification/', methods=['POST'])
 def send_email_verification():
 
