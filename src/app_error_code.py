@@ -9,6 +9,7 @@ UNEXPECTED_ERROR = 'UNEXPECTED_ERROR'
 INVALID_CUSTOM_ID_TOKEN = 'INVALID_CUSTOM_ID_TOKEN'
 INVALID_ID_TOKEN = 'INVALID_ID_TOKEN'
 LOCKED_MACHINE = 'LOCKED_MACHINE'
+INSUFFICIENT_TOKENS = 'INSUFFICIENT_TOKENS'
 
 #app_error_code in execption form
 
@@ -43,4 +44,7 @@ class InvalidIdTokenException(Exception):
     pass
 
 class LockedMachineException(Exception):
+    pass
+
+class InsufficientTokensException(Exception):
     pass

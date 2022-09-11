@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pytz
 
+import app_error_code
 from own_firebase_admin import db
 from models import token_information
 
@@ -48,3 +49,33 @@ def recharge_tokens(user_info_id, amount_to_recharge):
     }
 
     token_information_SnapShot.reference.update(update_query)
+
+def consume_tokens(user_info_id, amount_to_consume):
+    """consume an amount of tokens from the db
+
+    Args:
+        user_info_id (str): the user id from where consume the tokens
+        amount_to_consume (int): the amount of tokens to consume
+
+    Raises:
+        ValueError: if the amount to consume is minor than 0
+        app_error_code.InsufficientTokensException: if there is not sufficient tokens in the account of an user
+    """
+
+    if amount_to_consume < 0:
+        raise ValueError('the amount to consume should be greater or equals to 0')
+
+    token_information_snapshot = __get_token_information_SnapShot_by_id(user_info_id)
+
+    current_amount_of_tokens = token_information_snapshot.get('amount_of_tokens')
+
+    if current_amount_of_tokens < amount_to_consume:
+        raise app_error_code.InsufficientTokensException()
+
+    updated_amount_of_tokens = current_amount_of_tokens - amount_to_consume
+
+    update_query = {
+        'amount_of_tokens': updated_amount_of_tokens
+    }
+
+    token_information_snapshot.reference.update(update_query)

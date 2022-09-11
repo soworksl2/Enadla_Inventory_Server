@@ -89,3 +89,21 @@ def get_machine_link_locked_time():
     output = int(output)
 
     return output
+
+def get_balance_status_key_price():
+    """returns the price for the balance status key
+
+    Raises:
+        ValueError: if the balance status key is minor than 0
+
+    Returns:
+        int: the cost in tokens of the balance status key
+    """
+
+    output = os.environ['BALANCE_STATUS_KEY_PRICE']
+    output = int(output)
+
+    if output < 0:
+        raise ValueError('the balance status key should be greater or equals than 0')
+
+    return output
