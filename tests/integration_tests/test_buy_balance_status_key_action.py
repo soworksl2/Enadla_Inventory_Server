@@ -40,11 +40,6 @@ class TestBuyBalanceStatusKeyAction(unittest.TestCase):
         return super().tearDown()
 
     # *-*-*-*-*-*-*-*-*-*- tests *-*-*-*-*-*-*-*-*-*-
-    #in all the tests the price for balance will be 1 tokens excepts in specific cases
-
-    #si se tiene tokens sufucientes entonces comprar*
-    #si no se tiene tokens suficiente entonces error*
-    #si se tiene la cantidad justa entonces comprar*
 
     def test_given_wrong_slfs_then_error_is_HTTP_BASIC_ERROR(self):
         #arrange
