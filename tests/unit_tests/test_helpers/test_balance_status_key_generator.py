@@ -34,6 +34,14 @@ class TestBalanceStatusKeyGenerator(unittest.TestCase):
                 #assert
                 self.assertEqual(result, valid_balance_status_unlock_key)
 
+    def test_gbsuk_given_empty_balance_key_then_ValueError(self):
+        #arrange
+        balance_key = ''
+
+        with self.assertRaises(ValueError):
+            #act and assert
+            balance_status_key_generators.generate_balance_status_unlock_key(balance_key)
+
     # *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
 if __name__ == '__main__':
