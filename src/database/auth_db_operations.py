@@ -19,6 +19,14 @@ CN_EXTRA_USER_INFO = 'extra_user_info' if not is_debug else 'test_extra_user_inf
 
 #TODO: extract API_WEB_KEY const from each method and make it a global const
 
+def exists_user_info_by_id(uid):
+    try:
+        auth.get_user(uid)
+    except auth.UserNotFoundError:
+        return False
+    
+    return True
+
 def __has_machine_too_many_signUp(machine_id):
     RANGE_FOR_MAX_SIGNUP = app_constants.get_range_for_max_signUp()
     MAX_SIGNUP_PER_MACHINE = app_constants.get_max_signUp_per_machine_in_range()

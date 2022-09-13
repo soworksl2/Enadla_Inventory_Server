@@ -24,6 +24,8 @@ def signUp(
     if force_is_verified:
         auth.update_user(uid, email_verified = True)
 
+    return uid
+
 def authenticate(flask_test_client, email_number = 1, custom_password = '123456', custom_machine_id = 'test_machine1'):
     request_body = helper.process_and_add_slfs({
         'machine_id': custom_machine_id,

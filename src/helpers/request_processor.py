@@ -100,7 +100,7 @@ def __request_have_valid_SLFS(request):
 
     return request['slfs'] == correct_slfs
 
-def parse_request(specification, fields_converter = None):
+def parse_request(specification, fields_converter = None, use_slfs = True):
     """take the flask's request obj and parse it with the business logic to return it.
 
     Args:
@@ -116,15 +116,16 @@ def parse_request(specification, fields_converter = None):
     if not request.is_json:
         return (False, None)
 
-    specification['lt'] = {'type': 'string', 'required': True}
-    specification['slfs'] = {'type': 'string', 'required': True}
+    if use_slfs:
+        specification['lt'] = {'type': 'string', 'required': True}
+        specification['slfs'] = {'type': 'string', 'required': True}
 
     valid_request = normalize_and_validate(specification, request.json)
 
     if not valid_request:
         return (False, None)
 
-    if not __request_have_valid_SLFS(valid_request):
+    if use_slfs and not __request_have_valid_SLFS(valid_request):
         return (False, None)
 
     valid_request = own_json.process_json_obj(valid_request)

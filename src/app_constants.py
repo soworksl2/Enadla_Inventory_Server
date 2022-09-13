@@ -3,6 +3,10 @@
 
 import os
 
+def get_api_admin_key():
+    output = os.environ['API_ADMIN_KEY']
+    return output
+
 def get_web_api_key():
     """returns the web api key of this project
 

@@ -1,6 +1,7 @@
 from flask import Blueprint
 
 import app_error_code
+import app_constants
 from database import auth_db_operations, token_information_operations
 from helpers import request_processor, own_response_factory
 
@@ -39,3 +40,28 @@ def get_user_token_information():
         status=200,
         token_information=current_token_information.get_client_dict()
     )
+
+@token_information_bp.route('/recharge_by_uid_adm/', methods=['POST'])
+def recharge_by_uid_adm():
+    request_specification = {
+        'api_admin_key': {'type': 'string', 'required': True},
+        'uid': {'type': 'string', 'required': True},
+        'amount': {'type': 'integer', 'required': True, 'min': 0}
+    }
+
+    is_valid_request, valid_request = request_processor.parse_request(request_specification, use_slfs=False)
+
+    if not is_valid_request:
+        return own_response_factory.create_json_body(400, error_code=app_error_code.HTTP_BASIC_ERROR)
+
+    if not valid_request['api_admin_key'] == app_constants.get_api_admin_key():
+        return own_response_factory.create_json_body(401, error_code=app_error_code.INVALID_API_ADMIN_KEY)
+
+    try:
+        token_information_operations.recharge_tokens(valid_request['uid'], valid_request['amount'])
+    except app_error_code.UserNotExistsOrDisableException:
+        return own_response_factory.create_json_body(404, error_code=app_error_code.USER_NOT_EXISTS_OR_DISABLE)
+    except Exception:
+        return own_response_factory.create_json_body(400, error_code=app_error_code.UNEXPECTED_ERROR)
+
+    return own_response_factory.create_json_body(200)

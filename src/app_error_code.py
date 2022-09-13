@@ -10,6 +10,7 @@ INVALID_CUSTOM_ID_TOKEN = 'INVALID_CUSTOM_ID_TOKEN'
 INVALID_ID_TOKEN = 'INVALID_ID_TOKEN'
 LOCKED_MACHINE = 'LOCKED_MACHINE'
 INSUFFICIENT_TOKENS = 'INSUFFICIENT_TOKENS'
+INVALID_API_ADMIN_KEY = 'INVALID_API_ADMIN_KEY'
 
 #app_error_code in execption form
 
@@ -47,4 +48,7 @@ class LockedMachineException(Exception):
     pass
 
 class InsufficientTokensException(Exception):
+    pass
+
+class InvalidApiAdminKeyException(Exception):
     pass

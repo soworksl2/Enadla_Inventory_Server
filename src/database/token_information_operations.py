@@ -6,6 +6,7 @@ import pytz
 import app_error_code
 from own_firebase_admin import db
 from models import token_information
+from database import auth_db_operations
 
 
 #Collections names as CN
@@ -15,6 +16,9 @@ CN_TOKEN_INFORMATION = 'token_information' if not is_debug else 'test_token_info
 #*-*--**-*-*-*--**--*
 
 def __get_token_information_SnapShot_by_id(user_info_id):
+    if not auth_db_operations.exists_user_info_by_id(user_info_id):
+        raise app_error_code.UserNotExistsOrDisableException()
+
     token_information_collection = db.collection(CN_TOKEN_INFORMATION)
 
     token_informations_ref = token_information_collection.where('user_info_id', '==', user_info_id).get()
