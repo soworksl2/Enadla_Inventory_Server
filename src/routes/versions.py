@@ -24,3 +24,12 @@ def get_last_compatible_client_version():
         status=200,
         last_compatible_client_version=f'{major}.{minor}.{patch}'
     )
+
+@versions_BP.route('/backend_version', methods=['GET'])
+def get_backend_version():
+    current_backend_version= app_constants.get_backend_version()
+
+    return own_response_factory.create_json_body(
+        status=200,
+        backend_version=current_backend_version
+    )

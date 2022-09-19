@@ -4,6 +4,12 @@
 import os
 
 def get_api_admin_key():
+    """returns the api admin key for admin access in some endpoints of the api
+
+    Returns:
+        str: the api admin key
+    """
+
     output = os.environ['API_ADMIN_KEY']
     return output
 
@@ -93,6 +99,12 @@ def get_last_compatible_client_version():
         raise ValueError('LAST_COMPATIBLE_CLIENT_VERSION')
 
     return (major, minor, patch)
+
+def get_backend_version():
+    output = os.environ['BACKEND_VERSION']
+    output = int(output)
+
+    return output
 
 def get_machine_link_locked_time():
     """return the time in days that a machina can be locked upto it can be updated
