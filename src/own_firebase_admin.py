@@ -1,6 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from firebase_admin import storage
 
 # --- Exposing firebase module to be able to export from this wrapper 
 # (exporting modules from here ensure that the firebase app is initialized)
@@ -23,6 +24,10 @@ firebase_key_dict = {
 
 firebase_credentials = credentials.Certificate(firebase_key_dict)
 
-firebaseApp = firebase_admin.initialize_app(firebase_credentials)
+#TODO: set bucket name in .env
+firebaseApp = firebase_admin.initialize_app(firebase_credentials, {
+  'storageBucket': 'enadla-inventory-server.appspot.com'
+})
 
 db = firestore.client()
+default_bucket = storage.bucket()

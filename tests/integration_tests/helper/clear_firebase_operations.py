@@ -1,8 +1,9 @@
 """module with functions to clear tests stuff from the firebase project
 """
 
-from own_firebase_admin import auth, db
+from own_firebase_admin import auth, db, default_bucket
 from helper import faker_user_info_data
+from database import computed_products_operations
 
 def clear_tests_from_auth_db():
     """Clean all test user_info from the auth firebase db
@@ -36,3 +37,18 @@ def clear_tests_collecion_from_firestore():
 
     db_batch.commit()
 
+#TODO: clear all files that start with test/.
+#right now it delete files individually because list_blobs() function doesn't work
+#or at least i dont know how it works, in future it should list all files that start with
+#test/ and delete it. Jimy Aguas
+def clear_tests_from_storage():
+    all_computed_products_and_backups_filenames = [
+        computed_products_operations.FULL_COMPUTED_PRODUCTS_FILENAME,
+        computed_products_operations.FULL_BACKUP_COMPUTED_PRODUCTS_FILENAME,
+        computed_products_operations.FULL_DEEP_BACKUP_COMPUTED_PRODUCTS_FILENAME]
+
+    all_computed_products_and_backups = [default_bucket.get_blob(filename) for filename in all_computed_products_and_backups_filenames]
+
+    for computed_products_or_backup in all_computed_products_and_backups:
+        if computed_products_or_backup is not None:
+            computed_products_or_backup.delete()
