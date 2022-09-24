@@ -30,11 +30,12 @@ def __default_serialization(obj_to_serialize):
         except:
             raise TypeError(f'{type(obj_to_serialize)} cannot be serialized')
 
-def dumps(obj):
+def dumps(obj, sort_keys = False):
     """serialize an obj or a dict to string
 
     Args:
         obj (obj_dict_convertible | dict): the object that can be able to convert to dict or the dict to serialize
+        sort_keys (bool): indicate if order the keys before serialize
 
     Returns:
         str: the str obj serialized
@@ -43,7 +44,7 @@ def dumps(obj):
     if not isinstance(obj, dict) and not isinstance(obj, list):
         obj = obj.__dict__
 
-    return json.dumps(obj, default=__default_serialization)
+    return json.dumps(obj, default=__default_serialization, sort_keys=sort_keys)
 
 def loads(str_obj):
     """deserialize the obj with json.loads and then call process_json_obj and return the value
