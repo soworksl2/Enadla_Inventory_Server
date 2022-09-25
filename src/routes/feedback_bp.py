@@ -1,6 +1,7 @@
 from flask import Blueprint
 
 import app_error_code
+import app_constants
 from helpers import request_processor
 from helpers import own_response_factory
 from database import auth_db_operations, feedback_operations
@@ -48,3 +49,30 @@ def send_product_feedback():
         return own_response_factory.create_json_body(400, error_code=app_error_code.UNEXPECTED_ERROR)
 
     return own_response_factory.create_json_body(200)
+
+@feedback_bp.route('/product/', methods=['GET'])
+def get_all_products_feedback_adm():
+    request_specification = {
+        'api_admin_key': {'type': 'string', 'required': True}
+    }
+
+    is_valid_request, valid_request = request_processor.parse_request(request_specification, use_slfs=False)
+
+    if not is_valid_request:
+        return own_response_factory.create_json_body(400, error_code=app_error_code.HTTP_BASIC_ERROR)
+
+    api_admin_key = valid_request['api_admin_key']
+
+    if api_admin_key != app_constants.get_api_admin_key():
+        return own_response_factory.create_json_body(401, error_code=app_error_code.INVALID_API_ADMIN_KEY)
+
+    try:
+        products_feedback = feedback_operations.get_all_products_feedback()
+    except:
+        return own_response_factory.create_json_body(400, error_code=app_error_code.UNEXPECTED_ERROR)
+
+    return own_response_factory.create_json_body(
+        200,
+        products_feedback=products_feedback
+    )
+
