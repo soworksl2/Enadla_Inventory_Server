@@ -84,3 +84,13 @@ def add_individual_products_feedback(uid, all_individual_products_feedback: list
 def get_all_products_feedback() -> list[product_feedback.ProductFeedback]:
     return [product_feedback.ProductFeedback.from_dict(**product_feedback_reference.get().to_dict())
     for product_feedback_reference in db.collection(CN_PRODUCT_FEEDBACK).list_documents()]
+
+def delete_all_products_feedback():
+    batch_delete_operation = db.batch()
+
+    all_documents_to_delete = db.collection(CN_PRODUCT_FEEDBACK).list_documents()
+
+    for document_to_delete in all_documents_to_delete:
+        batch_delete_operation.delete(document_to_delete)
+
+    batch_delete_operation.commit()
