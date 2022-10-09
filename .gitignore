@@ -8,6 +8,5 @@ ActivateVenv.bat
 load_environ_vars.bat
 
 .vscode
-.env
 
 **/__pycache__
