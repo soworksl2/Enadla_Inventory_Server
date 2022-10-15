@@ -1,11 +1,10 @@
 from flask import Blueprint
 
-import app_error_code
-import app_constants
-from helpers import own_response_factory
-from database import computed_products_operations
-from helpers import request_processor
-from models import computed_products
+from core import app_error_code, app_constants
+from core.helpers import own_response_factory
+from core.database import computed_products_operations
+from core.helpers import request_processor
+from core.models import computed_products
 
 computed_products_bp = Blueprint('computed_products', __name__)
 

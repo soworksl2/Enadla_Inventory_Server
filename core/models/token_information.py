@@ -1,7 +1,7 @@
 from datetime import datetime
 from dataclasses import dataclass
 
-from helpers import own_json
+from core.helpers import own_json
 
 @dataclass
 class TokenInformation:

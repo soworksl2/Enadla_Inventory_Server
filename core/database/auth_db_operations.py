@@ -4,12 +4,11 @@ from datetime import datetime, timedelta
 import pytz
 import requests
 
-import app_error_code
-import app_constants
-from own_firebase_admin import auth, db
-from models import user_info
-from database import token_information_operations, machine_links_operations
-from helpers import own_json
+from core import app_constants, app_error_code
+from core.own_firebase_admin import auth, db
+from core.models import user_info
+from core.database import token_information_operations, machine_links_operations
+from core.helpers import own_json
 
 #region Collection Names as CN
 is_debug = 'DEBUG' in argv
@@ -56,8 +55,6 @@ def does_email_exists(email: str):
         auth.get_user_by_email(email)
     except auth.UserNotFoundError:
         email_exists = False
-    
-    print(f'user was found: {email_exists}')
 
     return email_exists
 

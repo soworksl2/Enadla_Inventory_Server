@@ -1,8 +1,8 @@
 from flask import Blueprint
 
-import app_error_code
-from helpers import request_processor, own_response_factory
-from database import auth_db_operations, shop_operations
+from core import app_error_code
+from core.helpers import request_processor, own_response_factory
+from core.database import auth_db_operations, shop_operations
 
 shop_bp = Blueprint('shop', __name__)
 

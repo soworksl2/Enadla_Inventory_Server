@@ -1,17 +1,6 @@
-import os
-import sys
 import unittest
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
-
-from helpers import balance_status_key_generators
+from core.helpers import balance_status_key_generators
 
 class TestBalanceStatusKeyGenerator(unittest.TestCase):
 

@@ -3,10 +3,10 @@ from datetime import datetime
 
 import pytz
 
-import app_error_code
-from own_firebase_admin import db
-from models import token_information
-from database import auth_db_operations
+from core import app_error_code
+from core.own_firebase_admin import db
+from core.models import token_information
+from core.database import auth_db_operations
 
 
 #Collections names as CN

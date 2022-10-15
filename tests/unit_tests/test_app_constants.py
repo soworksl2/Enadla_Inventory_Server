@@ -1,19 +1,11 @@
 import unittest
 import os
-import sys
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
+from core import app_constants
 
-import app_constants
 
 class _FakeEnvironContext:
-    
+
     def __init__(self, fake_environ):
         self.fake_environ = fake_environ
 
@@ -68,6 +60,3 @@ class TestAppConstants(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         #act and assert
                         app_constants.get_last_compatible_client_version()
-
-if __name__ == '__main__':
-    unittest.main()

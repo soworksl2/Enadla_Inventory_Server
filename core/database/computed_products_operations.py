@@ -1,8 +1,8 @@
 from sys import argv
 
-from own_firebase_admin import default_bucket
-from helpers import own_json
-from models import computed_products
+from core.own_firebase_admin import default_bucket
+from core.helpers import own_json
+from core.models import computed_products
 
 is_debug = 'DEBUG' in argv
 

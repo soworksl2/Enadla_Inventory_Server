@@ -2,16 +2,7 @@ import os
 import sys
 import unittest
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
-
-from helpers import model_helper
+from core.helpers import model_helper
 
 class _Point:
     def __init__(self, x, y, z=0):

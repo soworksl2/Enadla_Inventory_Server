@@ -1,7 +1,8 @@
 from datetime import datetime
-from own_firebase_admin import auth, db
-import helper
-from helper import faker_user_info_data
+
+from core.own_firebase_admin import auth, db
+from tests.integration_tests import helper
+from tests.integration_tests.helper import faker_user_info_data
 
 def signUp(
             flask_test_client,

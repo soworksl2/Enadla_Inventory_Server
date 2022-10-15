@@ -1,11 +1,10 @@
 from flask import Blueprint
 
-import app_error_code
-import app_constants
-from helpers import request_processor
-from helpers import own_response_factory
-from database import auth_db_operations, feedback_operations
-from models import product_feedback
+from core import app_error_code, app_constants
+from core.helpers import request_processor
+from core.helpers import own_response_factory
+from core.database import auth_db_operations, feedback_operations
+from core.models import product_feedback
 
 feedback_bp = Blueprint('feedback', __name__)
 

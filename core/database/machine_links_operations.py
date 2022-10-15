@@ -5,10 +5,9 @@ from datetime import datetime, timedelta
 
 import pytz
 
-import app_error_code
-import app_constants
-from own_firebase_admin import db
-from models import machine_link
+from core import app_error_code, app_constants
+from core.own_firebase_admin import db
+from core.models import machine_link
 
 #region Collection names as CN
 is_debug = 'DEBUG' in argv

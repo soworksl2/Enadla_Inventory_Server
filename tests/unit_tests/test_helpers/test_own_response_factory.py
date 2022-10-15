@@ -1,18 +1,8 @@
-from datetime import datetime
 import os
 import sys
 import unittest
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
-
-from helpers import own_response_factory
+from core.helpers import own_response_factory
 
 class Point:
     def __init__(self, x, y):

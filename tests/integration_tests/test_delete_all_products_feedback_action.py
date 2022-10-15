@@ -1,26 +1,16 @@
-import os
 import sys
 import unittest
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
-
 sys.argv.append('DEBUG')
 
-from app import app_server
-from own_firebase_admin import default_bucket
+from core import create_app
+from core.own_firebase_admin import default_bucket
 
-import app_error_code
-import app_constants
-from helper import clear_firebase_operations, database_helper
-from models import product_feedback
-from database import feedback_operations
-from helpers import own_json
+from core import app_error_code, app_constants
+from tests.integration_tests.helper import clear_firebase_operations, database_helper
+from core.models import product_feedback
+from core.database import feedback_operations
+from core.helpers import own_json
 
 class TestDeleteAllProductsFeedbackAction(unittest.TestCase):
 
@@ -28,6 +18,8 @@ class TestDeleteAllProductsFeedbackAction(unittest.TestCase):
     def setUpClass(cls):
         clear_firebase_operations.clear_tests_from_auth_db()
         clear_firebase_operations.clear_tests_collecion_from_firestore()
+
+        app_server = create_app.create()
 
         app_server.config.update({
             "TESTING": True

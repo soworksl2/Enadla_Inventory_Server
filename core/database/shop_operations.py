@@ -1,6 +1,6 @@
-import app_constants
-from database import token_information_operations
-from helpers import balance_status_key_generators
+from core import app_constants
+from core.database import token_information_operations
+from core.helpers import balance_status_key_generators
 
 def buy_balance_status_key(user_id, balance_key):
     balance_status_key_price = app_constants.get_balance_status_key_price()

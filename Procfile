@@ -1,1 +1,1 @@
-web: env PYTHONPATH=$PYTHONPATH:$PWD/src gunicorn --bind 0.0.0.0:${PORT} src.app:app_server --preload --timeout 10
+web: gunicorn --bind 0.0.0.0:${PORT} core.create_app.create() --preload --timeout 10

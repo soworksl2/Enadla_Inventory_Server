@@ -1,20 +1,11 @@
-import os
 import sys
 import unittest
 from unittest.mock import patch
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
-
 sys.argv.append('DEBUG')
 
-from app import app_server
-from helper import clear_firebase_operations
+from core import create_app
+from tests.integration_tests.helper import clear_firebase_operations
 
 class TestGetLastCompatibleClientVersionAction(unittest.TestCase):
 
@@ -22,6 +13,8 @@ class TestGetLastCompatibleClientVersionAction(unittest.TestCase):
     def setUpClass(cls):
         clear_firebase_operations.clear_tests_from_auth_db()
         clear_firebase_operations.clear_tests_collecion_from_firestore()
+
+        app_server = create_app.create()
 
         app_server.config.update({
             "TESTING": True
@@ -37,7 +30,7 @@ class TestGetLastCompatibleClientVersionAction(unittest.TestCase):
     # *-*-*-*-*-*-*-*-*-*- tests *-*-*-*-*-*-*-*-*-*-
 
     def test_given_valid_request_then_return_the_valid_last_compatible_client_versio(self):
-        with patch('app_constants.get_last_compatible_client_version') as mock_get_last_compatible_client_version:
+        with patch('core.app_constants.get_last_compatible_client_version') as mock_get_last_compatible_client_version:
             #arrange
             mock_get_last_compatible_client_version.return_value = (1, 0, 1)
 

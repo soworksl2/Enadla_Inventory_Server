@@ -2,8 +2,8 @@ import json
 
 from flask import Blueprint, Response
 
-import app_constants
-from helpers import own_response_factory
+from core import app_constants
+from core.helpers import own_response_factory
 
 versions_BP = Blueprint('versions', __name__)
 

@@ -3,10 +3,6 @@ Lib
 Scripts
 pyvenv.cfg
 
-startServer.bat
-ActivateVenv.bat
-load_environ_vars.bat
-
-.vscode
+activeVenv.bat
 
 **/__pycache__

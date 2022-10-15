@@ -6,7 +6,7 @@
 
 from dataclasses import dataclass
 
-from helpers import model_helper
+from core.helpers import model_helper
 
 @dataclass
 class ProductFeedbacker:

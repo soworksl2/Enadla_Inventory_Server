@@ -4,8 +4,8 @@ from enum import Enum
 
 import pytz
 
-from helpers import validation_functions as v
-from helpers import model_helper
+from core.helpers import validation_functions as v
+from core.helpers import model_helper
 
 @dataclass
 class ExtraUserInfo:

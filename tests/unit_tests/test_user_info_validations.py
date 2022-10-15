@@ -1,16 +1,7 @@
-import os
-import sys
 import unittest
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
+from core.models import user_info
 
-from models import user_info
 
 class TestUserInfoValidations(unittest.TestCase):
 
@@ -27,7 +18,7 @@ class TestUserInfoValidations(unittest.TestCase):
     def get_posibles_empty_strings(self):
         return ['', ' ', '   ', None]
 
-    #testing signup ruleset as su
+    # testing signup ruleset as su
 
     def test_su_given_good_user_info_then_is_valid(self):
         #arrange
@@ -183,7 +174,8 @@ class TestUserInfoValidations(unittest.TestCase):
                 self.assertFalse(result[0])
                 self.assertIn(user_info.ValidationFails.empty_creator_machine, result[1])
 
-    #-----------------------
+    # -----------------------
+
 
 if __name__ == '__main__':
     unittest.main()

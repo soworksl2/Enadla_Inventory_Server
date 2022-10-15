@@ -1,6 +1,6 @@
 import jwt
 
-import secrets_keys
+from core import secrets_keys
 
 def decode_JWT(raw_JWT):
     is_valid = False

@@ -3,7 +3,7 @@ import hashlib
 from flask import request
 from cerberus import Validator
 
-from helpers import own_json
+from core.helpers import own_json
 
 class _RequestValidator(Validator):
     pass

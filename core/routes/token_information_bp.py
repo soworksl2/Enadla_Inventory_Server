@@ -1,9 +1,8 @@
 from flask import Blueprint
 
-import app_error_code
-import app_constants
-from database import auth_db_operations, token_information_operations
-from helpers import request_processor, own_response_factory
+from core import app_constants, app_error_code
+from core.database import auth_db_operations, token_information_operations
+from core.helpers import request_processor, own_response_factory
 
 token_information_bp = Blueprint('token_information', __name__)
 

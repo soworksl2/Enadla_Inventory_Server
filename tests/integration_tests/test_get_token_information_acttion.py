@@ -1,24 +1,14 @@
-import os
 import sys
 import unittest
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
-
 sys.argv.append('DEBUG')
 
-from app import app_server
+from core import create_app
 
-from own_firebase_admin import auth
-import helper
-import app_error_code
-import app_constants
-from helper import clear_firebase_operations, database_helper
+from core.own_firebase_admin import auth
+from tests.integration_tests import helper
+from core import app_constants, app_error_code
+from tests.integration_tests.helper import clear_firebase_operations, database_helper
 
 class TestGetTokenInformationAction(unittest.TestCase):
 
@@ -26,6 +16,8 @@ class TestGetTokenInformationAction(unittest.TestCase):
     def setUpClass(cls):
         clear_firebase_operations.clear_tests_from_auth_db()
         clear_firebase_operations.clear_tests_collecion_from_firestore()
+
+        app_server = create_app.create()
 
         app_server.config.update({
             "TESTING": True

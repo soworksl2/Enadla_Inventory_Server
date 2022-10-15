@@ -1,8 +1,8 @@
 from sys import argv
 
-from helpers import own_json
-from own_firebase_admin import db
-from models import product_feedback
+from core.helpers import own_json
+from core.own_firebase_admin import db
+from core.models import product_feedback
 
 #region Collection Names as CN
 is_debug = 'DEBUG' in argv

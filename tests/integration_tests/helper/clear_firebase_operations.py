@@ -1,9 +1,9 @@
 """module with functions to clear tests stuff from the firebase project
 """
 
-from own_firebase_admin import auth, db, default_bucket
-from helper import faker_user_info_data
-from database import computed_products_operations
+from core.own_firebase_admin import auth, db, default_bucket
+from tests.integration_tests.helper import faker_user_info_data
+from core.database import computed_products_operations
 
 def clear_tests_from_auth_db():
     """Clean all test user_info from the auth firebase db

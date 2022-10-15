@@ -1,27 +1,17 @@
 from datetime import datetime, timedelta
-import os
 import sys
 import unittest
 
 import pytz
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
-
 sys.argv.append('DEBUG')
 
-from app import app_server
+from core import create_app
 
-from own_firebase_admin import auth
-from database import token_information_operations
-import app_constants
-import app_error_code
-from helper import clear_firebase_operations, database_helper
+from core.own_firebase_admin import auth
+from core.database import token_information_operations
+from core import app_error_code, app_constants
+from tests.integration_tests.helper import clear_firebase_operations, database_helper
 
 class TestRechargeByUidAdm(unittest.TestCase):
 
@@ -29,6 +19,8 @@ class TestRechargeByUidAdm(unittest.TestCase):
     def setUpClass(cls):
         clear_firebase_operations.clear_tests_from_auth_db()
         clear_firebase_operations.clear_tests_collecion_from_firestore()
+
+        app_server = create_app.create()
 
         app_server.config.update({
             "TESTING": True

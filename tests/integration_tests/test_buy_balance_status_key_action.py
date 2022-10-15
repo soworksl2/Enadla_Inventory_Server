@@ -1,25 +1,15 @@
-import os
 import sys
 import unittest
 from unittest.mock import patch
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
-
 sys.argv.append('DEBUG')
 
-import helper
-import app_error_code
-import app_constants
-from app import app_server
-from database import token_information_operations, auth_db_operations
-from helper import database_helper
-from helper import clear_firebase_operations
+from tests.integration_tests import helper
+from core import app_error_code, app_constants
+from core import create_app
+from core.database import token_information_operations, auth_db_operations
+from tests.integration_tests.helper import database_helper
+from tests.integration_tests.helper import clear_firebase_operations
 
 class TestBuyBalanceStatusKeyAction(unittest.TestCase):
 
@@ -27,6 +17,8 @@ class TestBuyBalanceStatusKeyAction(unittest.TestCase):
     def setUpClass(cls):
         clear_firebase_operations.clear_tests_from_auth_db()
         clear_firebase_operations.clear_tests_collecion_from_firestore()
+
+        app_server = create_app.create()
 
         app_server.config.update({
             "TESTING": True
@@ -84,8 +76,8 @@ class TestBuyBalanceStatusKeyAction(unittest.TestCase):
 
         for init_tokens_on_signup, balance_status_key_price in variable_config_for_tests:                
             with \
-                patch('app_constants.get_balance_status_key_price') as mock_balance_status_key_price,\
-                patch('app_constants.get_init_tokens_on_signUp') as mock_init_tokens_on_signUp:
+                patch('core.app_constants.get_balance_status_key_price') as mock_balance_status_key_price,\
+                patch('core.app_constants.get_init_tokens_on_signUp') as mock_init_tokens_on_signUp:
 
                 mock_balance_status_key_price.return_value = balance_status_key_price
                 mock_init_tokens_on_signUp.return_value = init_tokens_on_signup
@@ -123,8 +115,8 @@ class TestBuyBalanceStatusKeyAction(unittest.TestCase):
 
         for init_tokens_on_signup, balance_status_key_price in variables_config_for_tests:
             with \
-                patch('app_constants.get_balance_status_key_price') as mock_balance_status_key_price,\
-                patch('app_constants.get_init_tokens_on_signUp') as mock_init_tokens_on_signUp:
+                patch('core.app_constants.get_balance_status_key_price') as mock_balance_status_key_price,\
+                patch('core.app_constants.get_init_tokens_on_signUp') as mock_init_tokens_on_signUp:
 
                 mock_init_tokens_on_signUp.return_value = init_tokens_on_signup
                 mock_balance_status_key_price.return_value = balance_status_key_price
@@ -162,8 +154,8 @@ class TestBuyBalanceStatusKeyAction(unittest.TestCase):
 
         for init_tokens_on_signup, balance_status_key_price in variables_config_for_tests:
             with \
-                patch('app_constants.get_balance_status_key_price') as mock_balance_status_key_price,\
-                patch('app_constants.get_init_tokens_on_signUp') as mock_init_tokens_on_signUp:
+                patch('core.app_constants.get_balance_status_key_price') as mock_balance_status_key_price,\
+                patch('core.app_constants.get_init_tokens_on_signUp') as mock_init_tokens_on_signUp:
 
                 mock_init_tokens_on_signUp.return_value = init_tokens_on_signup
                 mock_balance_status_key_price.return_value = balance_status_key_price

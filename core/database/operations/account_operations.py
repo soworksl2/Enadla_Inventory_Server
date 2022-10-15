@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 
 import pytz
 
-from own_firebase_admin import db
-from models import enadla_account, token_information
+from core.own_firebase_admin import db
+from core.models import enadla_account, token_information
 
 is_debug = 'DEBUG' in argv
 

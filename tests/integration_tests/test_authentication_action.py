@@ -1,27 +1,22 @@
-import os
 import sys
 import unittest
 from datetime import datetime, timedelta
 
 import pytz
 
-#region adding src folder to sys.path
-root_path = os.path.dirname(os.path.realpath(__file__))
-root_path = os.path.dirname(root_path)
-root_path = os.path.dirname(root_path)
-src_path = os.path.join(root_path, 'src')
-sys.path.append(src_path)
-#endregion
-
 sys.argv.append('DEBUG')
 
-from app import app_server
-from own_firebase_admin import db
+from core import create_app
+from core.own_firebase_admin import db
 
-import helper
-import app_error_code
-import app_constants
-from helper import clear_firebase_operations, faker_user_info_data, database_helper
+from tests.integration_tests import helper
+from core import app_error_code, app_constants
+from tests.integration_tests.helper import (
+    clear_firebase_operations,
+    faker_user_info_data,
+    database_helper
+)
+
 
 class TestAuthenticationAction(unittest.TestCase):
 
@@ -29,6 +24,8 @@ class TestAuthenticationAction(unittest.TestCase):
     def setUpClass(cls):
         clear_firebase_operations.clear_tests_from_auth_db()
         clear_firebase_operations.clear_tests_collecion_from_firestore()
+
+        app_server = create_app.create()
 
         app_server.config.update({
             "TESTING": True
